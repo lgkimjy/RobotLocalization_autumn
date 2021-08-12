@@ -16,17 +16,23 @@
 #include <numeric>
 #include <random>
 
-#include "ros/ros.h"
+#include <ros/ros.h>
+#include <ros/package.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/Twist.h>
+#include <alice_msgs/FoundObject.h>
+#include <alice_msgs/FoundObjectArray.h>
+
 
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/Image.h>
 #include <opencv2/opencv.hpp>
-#include <ros/package.h>
 
 using namespace std;
 using namespace cv;
+
+void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr& msg);
+void bodydeltaCallback(const geometry_msgs::Twist::ConstPtr& msg);
+void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg);
 
 struct Particle{
 	int id;
