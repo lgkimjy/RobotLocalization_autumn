@@ -31,12 +31,13 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   roslib
   cv_bridge
+  alice_msgs
 )
 
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES ${PROJECT_NAME}
-CATKIN_DEPENDS roscpp roslib cv_bridge sensor_msgs  geometry_msgs
+CATKIN_DEPENDS roscpp roslib cv_bridge sensor_msgs  geometry_msgs alice_msgs
 DEPENDS system_lib OPENCV
 )
 
