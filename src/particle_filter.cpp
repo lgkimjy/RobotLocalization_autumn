@@ -35,9 +35,9 @@ void ParticleFilter::init_square(float x, float y, float theta) {
   for (int i = 0; i < num_particles; i++) {
     Particle p;
     p.id = i;
-    p.x = getRandom(repos_range_x[0], repos_range_x[1]);;
-    p.y = getRandom(repos_range_y[0], repos_range_y[1]);;
-    p.theta = getRandom(repos_range_w[0], repos_range_w[1]);;
+    p.x = getRandom(repos_range_x[0], repos_range_x[1]);
+    p.y = getRandom(repos_range_y[0], repos_range_y[1]);
+    p.theta = getRandom(repos_range_w[0], repos_range_w[1]);
     p.weight = 1.0;
 
     particles.push_back(p);
@@ -48,7 +48,7 @@ void ParticleFilter::init_square(float x, float y, float theta) {
 
 void ParticleFilter::init_circle(double x, double y, double theta, double std[]) {
 
-  num_particles = 1;
+  num_particles = 500;
 
   // define normal distributions for sensor noise
   normal_distribution<double> N_x_init(0, std[0]);
@@ -78,19 +78,21 @@ void ParticleFilter::init_circle(double x, double y, double theta, double std[])
 void ParticleFilter::prediction(float move_x, float move_y, float move_w){
 
   for (int i = 0; i < num_particles; i++) {
-    // float noise_x = move_x + getRandomGaussian(0.0, move_x * 0.1);
-    // float noise_y = move_y + getRandomGaussian(0.0, move_y * 0.1);
-    // float noise_w = move_w + getRandomGaussian(0.0, move_w * 0.1);
-
-    // particles[i].x += cos(particles[i].theta) * noise_x + sin(particles[i].theta) * noise_y;
-    // particles[i].y += sin(particles[i].theta) * noise_x + cos(particles[i].theta) * noise_y;
-    // particles[i].theta += noise_w;
-    // particles[i].theta = fmodf(particles[i].theta + M_PI * 2.0, M_PI*2.0);
   
-    particles[i].x += (cos(particles[i].theta) * move_x + sin(particles[i].theta) * move_y) / 10.0;
-    particles[i].y += (sin(particles[i].theta) * move_x + cos(particles[i].theta) * move_y) / 10.0;
-    particles[i].theta += move_w;
+    float noise_x = move_x + getRandomGaussian(0.0, move_x * 0.1);
+    float noise_y = move_y + getRandomGaussian(0.0, move_y * 0.1);
+    float noise_w = move_w + getRandomGaussian(0.0, move_w * 0.1);
+
+    particles[i].x += cos(particles[i].theta) * noise_x + sin(particles[i].theta) * noise_y;
+    particles[i].y += sin(particles[i].theta) * noise_x + cos(particles[i].theta) * noise_y;
+    particles[i].theta += noise_w;
     particles[i].theta = fmodf(particles[i].theta + M_PI * 2.0, M_PI*2.0);
+
+    /* w/o movement noise */
+    // particles[i].x += (cos(particles[i].theta) * move_x + sin(particles[i].theta) * move_y);
+    // particles[i].y += (sin(particles[i].theta) * move_x + cos(particles[i].theta) * move_y);
+    // particles[i].theta += move_w;
+    // particles[i].theta = fmodf(particles[i].theta + M_PI * 2.0, M_PI*2.0);
   }
 }
 
