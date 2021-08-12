@@ -12,6 +12,7 @@ string color_image_map_path = ros::package::getPath("robot_localization_data") +
 Mat color_map_image = imread(color_image_map_path.c_str());
 
 ParticleFilter pf;
+vector<LandmarkObs> observations;
 bool flag_move;
 
 int main(int argc, char** argv)
@@ -139,7 +140,7 @@ void bodydeltaCallback(const geometry_msgs::Twist::ConstPtr& msg)
 
 void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg)
 {
-    vector<LandmarkObs> observations;
+    observations.clear();
     LandmarkObs obs;
     for(int i=0;i<msg->length;i++){
         if(msg->data[i].name == "cpoint" || msg->data[i].name == "lpoint" || 
@@ -151,6 +152,9 @@ void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg)
         else
             continue;
     }
+
+    /* checker */
+    cout << "size : " << observations.size() << "   ";
     for(auto a : observations){
         cout << a.x << ", " << a.y << "    ";
     }
