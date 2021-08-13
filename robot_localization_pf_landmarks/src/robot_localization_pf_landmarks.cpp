@@ -36,23 +36,22 @@ int main(int argc, char **argv)
     /* Read map data */
     Map map;
     if(!read_map_data(ros::package::getPath("robot_localization_data") + "/data/map_data.txt", map)){
-        ROS_ERROR("Error: Could not open map file");
+        ROS_ERROR("[robot_localization_pf_landmark] Error: Could not open map file");
         return -1;
-    }else ROS_INFO("Success: Open and Reads map file");
-
+    }else ROS_INFO("[robot_localization_pf_landmark] Success: Open and Read the map file");
     /* number of landmarks */
-    cout << map.landmark_list.size() << endl;
+    ROS_INFO("[robot_localization_pf_landmark] Total reference landmarks (global coordinates) : %zu", map.landmark_list.size());
 
-    while (ros::ok())
+    while(ros::ok())
     {
         geometry_msgs::Pose2D robot_pos_msg;
 
         if(!pf.initialized())
         {
             pf.particles.clear();
-            cout << "initalize particles starting position" << endl;
-            // pf.init_circle(repos_x, repos_y, repos_w, sigma_pos);
-            pf.init_square(repos_x, repos_y, repos_w);
+            ROS_INFO("[robot_localization_pf_landmark] Initalize robot start position and particles random start position");
+            // pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
+            pf.initSquare(repos_x, repos_y, repos_w);
 
             /* reposition for kinematics only movement */
             sum_x = repos_x;
@@ -74,18 +73,20 @@ int main(int argc, char **argv)
             flag_move = false;
         }
 
-        /* observed landmarks global coordinates */
-        for(auto a : observations)
-        {
-            double t_x = cos(sum_theta) * a.x - sin(sum_theta) * a.y + sum_x;
-            double t_y = sin(sum_theta) * a.x + cos(sum_theta) * a.y + sum_y;
-            cout << t_x << " " << t_y << "    ";
-        }
-        cout << endl;
+        /* observed landmarks global coordinates based on kinematics_odom*/
+        // for(auto a : observations)
+        // {
+        //     double t_x = cos(sum_theta) * a.x - sin(sum_theta) * a.y + sum_x;
+        //     double t_y = sin(sum_theta) * a.x + cos(sum_theta) * a.y + sum_y;
+        //     cout << t_x << " " << t_y << "    ";
+        // }
+        // cout << endl;
+
 
         /* Update the weights and resample */
         pf.updateWeights(sigma_landmark, observations, map);
-        // pf.resample();
+        // pf.resampling();
+
 
         robot_pos_msg.x = sum_x - 5.2;
         robot_pos_msg.y = sum_y - 3.7;
@@ -97,16 +98,16 @@ int main(int argc, char **argv)
         robotpos_pub.publish(robot_pos_msg);
 
         /* visualize */
-        /* visualize landmark from kinematic calculated pos */
+        /* visualize landmark based on kinematic calculated pos, kinematics_odom */
         Mat localization_img = color_map_image.clone();
-        for (int i = 0; i < observations.size(); i++){
+        for(int i = 0; i < observations.size(); i++){
             double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
             double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
             Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
             circle(localization_img, ld_point, 10, Scalar(0, 0, 255), -1);
         }
         /* visualize particle pos */
-        for (int i = 0; i < pf.particles.size(); i++){
+        for(int i = 0; i < pf.particles.size(); i++){
             // ROS_INFO("Particle Pos : %3.2f, %3.2f, %2.3f", pf.particles[i].x, pf.particles[i].y, pf.particles[i].theta);              // real world
             // ROS_INFO("Particle Pos : %3.2f, %3.2f, %2.3f", pf.particles[i].x - 5.2, pf.particles[i].y - 3.7, pf.particles[i].theta);  // gloabl world
             Point2f point = Point2f(pf.particles[i].x * 100, localization_img.size().height - pf.particles[i].y * 100);
