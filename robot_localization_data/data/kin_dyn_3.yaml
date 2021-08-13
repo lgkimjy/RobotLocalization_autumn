@@ -1,0 +1,446 @@
+##  Base
+base:   #0
+  parent: -1
+  sibling: -1
+  child: 29
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+## Passive Joint
+passive_x: #29
+  parent: 0
+  sibling: -1
+  child: 30
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+passive_y: #30
+  parent: 29
+  sibling: -1
+  child: 31
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+passive_z: #31
+  parent: 30
+  sibling: -1
+  child: 32
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+passive_yaw: #32
+  parent: 31
+  sibling: -1
+  child: 33
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 1.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+passive_pitch: #33
+  parent: 32
+  sibling: -1
+  child: 34
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+passive_roll: #34
+  parent: 33
+  sibling: -1
+  child: 28
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+## Body
+
+#pelvis_link
+pelvis: #28
+  parent: 34
+  sibling: -1
+  child: 10
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.1]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+#torso pitch yaw
+torso_p: #10
+  parent: 28
+  sibling: 11
+  child: 9
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.154]
+  joint_axis: [0.0, -1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+torso_y: #9
+  parent: 10
+  sibling: -1
+  child: 7
+  mass: 5.383
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 0.0, 1.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  
+## Head
+
+#head pitch yaw
+head_p: #7
+  parent: 8
+  sibling: 1
+  child: 27
+  mass: 0.724
+  relative_position: [0.0, 0.0, 0.2695]
+  joint_axis: [0.0, 1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.5
+  joint_limit_min: -0.5
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+head_y: #8
+  parent: 9
+  sibling: -1
+  child: 7
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0]
+  joint_axis: [0.0,0.0, 1.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.5
+  joint_limit_min: -0.5
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+#camera
+cam: #27
+  parent: 7
+  sibling: -1
+  child: -1
+  mass: 1.0
+  relative_position: [0.0493, 0.0595, 0.133]
+  joint_axis: [0.0,0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.5
+  joint_limit_min: -0.5
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  
+## Left Arm
+
+#left arm shoulder pitch 1
+l_arm_sh_p1: #1
+  parent: 9
+  sibling: 2
+  child: 3
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.65
+  joint_limit_min: -0.65
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left arm shoulder roll
+l_arm_sh_r: #3
+  parent: 1
+  sibling: -1
+  child: 5
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0,0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.65
+  joint_limit_min: -0.65
+  inertia: [0.0, 0.0, 0.0, 0.00112, 0.0, 0.00113]
+#left arm elbow yaw
+l_arm_el_y: #5
+  parent: 5
+  sibling: -1
+  child: 23
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, -1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.45
+  joint_limit_min: -0.45
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left arm end effector
+l_arm_end: #23
+  parent: 5
+  sibling: -1
+  child: -1
+  mass: 0.0
+  relative_position: [0.145, 0.045, 0.0]
+  joint_axis: [0.0,0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        
+## Right Arm
+
+#right arm shoulder pitch 1
+r_arm_sh_p1: #2
+  parent: 9
+  sibling: -1
+  child: 4
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, -1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.65
+  joint_limit_min: -0.65
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right arm shoulder roll
+r_arm_sh_r: #4
+  parent: 2
+  sibling: -1
+  child: 6
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0,0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.65
+  joint_limit_min: -0.65
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right arm elbow yaw
+r_arm_el_y: #6
+  parent: 4
+  sibling: -1
+  child: 24
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0,-1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 0.45
+  joint_limit_min: -0.45
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right arm end effector
+r_arm_end: #24
+  parent: 6
+  sibling: -1
+  child: -1
+  mass: 0.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0,0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        
+## Left Leg
+
+#left leg hip yaw
+l_leg_hip_y: #11
+  parent: 13
+  sibling: -1
+  child: 17
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, -1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left leg hip roll
+l_leg_hip_r: #13
+  parent: 15
+  sibling: -1
+  child: 11
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left leg hip pitch
+l_leg_hip_p: #15
+  parent: 28
+  sibling: 16
+  child: 13
+  mass: 1.0
+  relative_position: [0.0, 0.07, 0.0]
+  joint_axis: [0.0, 0.0, 1.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left leg knee pitch
+l_leg_kn_p: #17
+  parent: 11
+  sibling: -1
+  child: 19
+  mass: 1.0
+  relative_position: [0.0, 0.0, -0.27]
+  joint_axis: [0.0, -1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left leg ankle pitch
+l_leg_an_p: #19
+  parent: 17
+  sibling: -1
+  child: 21
+  mass: 1.0
+  relative_position: [0.0, 0.0, -0.27]
+  joint_axis: [0.0, 1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left leg ankle roll
+l_leg_an_r: #21
+  parent: 19
+  sibling: -1
+  child: 25
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#left leg end
+l_leg_end: #25
+  parent: 21
+  sibling: -1
+  child: -1
+  mass: 0.0
+  relative_position: [0.0, 0.0, -0.122]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        
+## Right Leg
+
+#right leg hip yaw
+r_leg_hip_y: #12
+  parent: 14
+  sibling: -1
+  child: 18
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [0.0, 1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right leg hip roll
+r_leg_hip_r: #14
+  parent: 16
+  sibling: -1
+  child: 12
+  mass: 1.0
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right leg hip pitch
+r_leg_hip_p: #16
+  parent: 28
+  sibling: -1
+  child: 14
+  mass: 1.0
+  relative_position: [0.0, -0.07, 0.0]
+  joint_axis: [0.0, 0.0, 1.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right leg knee pitch
+r_leg_kn_p: #18
+  parent: 12
+  sibling: -1
+  child: 20
+  mass: 2.401
+  relative_position: [0.0, 0.0, -0.27]
+  joint_axis: [0.0, 1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right leg ankle pitch
+r_leg_an_p: #20
+  parent: 18
+  sibling: -1
+  child: 22
+  mass: 1.0
+  relative_position: [0.0, 0.0, -0.27]
+  joint_axis: [0.0, -1.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right leg ankle roll
+r_leg_an_r: #22
+  parent: 20
+  sibling: -1
+  child: 26
+  mass: 0.223
+  relative_position: [0.0, 0.0, 0.0]
+  joint_axis: [1.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 2.0
+  joint_limit_min: -2.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#right leg end
+r_leg_end: #26
+  parent: 22
+  sibling: -1
+  child: -1
+  mass: 0.0
+  relative_position: [0.0, 0.0, -0.122]
+  joint_axis: [0.0, 0.0, 0.0]
+  center_of_mass: [0.0, 0.0, 0.0]
+  joint_limit_max: 100.0
+  joint_limit_min: -100.0
+  inertia: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        
+thigh_length_m: 0.27
+calf_length_m: 0.27
+ankle_length_m: 0.122
+leg_side_offset_m: 0.14
+foot_pose: [0.0, 0.09, 0.60, 0, 0, 0]
+lipm_height_m: 0.330
+total_mass: 20 #18.85
+online_walking_pelvis_h: 0.60 #0.634
+y_steptype_y_offeset: 0.06
+y_steptype_yaw_offeset: 20
+default_y_offset_foot: 0.09

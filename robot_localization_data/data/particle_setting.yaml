@@ -1,0 +1,24 @@
+ETCSetting:
+  init_range_w: [-6, 6]
+  kidnap_range_w: [-1, 1]
+  interval_angle: 18
+  unit: 100
+  number_of_particle: 500
+  nosampling_sigma: 0.1
+  init_range_x: [4.2, 6.2]
+  reinit_weight: 0.002
+  kidnap_range_x: [0, 16]
+  kidnap_range_y: [0, 11]
+  init_range_y: [2.7, 4.7]
+NoiseSetting:
+  expanded_right_noise: [0.005, 0.002, 0.025]
+  forward_noise: [0.02, 0.01, 0.001]
+  left_turn_noise: [0.003, 0.01, 0.025]
+  backward_noise: [0.02, 0.01, 0.001]
+  right_noise: [0.003, 0.02, 0.001]
+  left_noise: [0.003, 0.02, 0.001]
+  sense_noise: 0.5
+  centered_right_noise: [0.001, 0.003, 0.025]
+  right_turn_noise: [0.003, 0.01, 0.025]
+  expanded_left_noise: [0.005, 0.002, 0.025]
+  centered_left_noise: [0.001, 0.003, 0.025]

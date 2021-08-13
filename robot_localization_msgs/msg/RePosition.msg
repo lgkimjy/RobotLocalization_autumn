@@ -1,0 +1,6 @@
+float32 range_low_x
+float32 range_high_x
+float32 range_low_y
+float32 range_high_y
+float32 range_low_w
+float32 range_high_w
