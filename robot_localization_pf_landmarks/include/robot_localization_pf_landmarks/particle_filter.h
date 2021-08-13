@@ -9,8 +9,6 @@
 #include "helper_functions.h"
 
 #include <iostream>
-#include <ctime>
-#include <iomanip>
 #include <random>
 #include <algorithm>
 #include <numeric>
@@ -23,7 +21,6 @@
 #include <geometry_msgs/Twist.h>
 #include <alice_msgs/FoundObject.h>
 #include <alice_msgs/FoundObjectArray.h>
-
 
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
@@ -60,19 +57,29 @@ class ParticleFilter{
 		std::vector<Particle> particles;
 
 		ParticleFilter():num_particles(0), is_initialized(false){}
-
 		~ParticleFilter(){}
 
+		/* gaussian func */
 		float getRandom(float low, float high);
 		float getRandomGaussian(float mean, float sigma);
+		double multivGaussian(double sig_x, double sig_y, double x_obs, double y_obs, double mu_x, double mu_y);
+		
+		/* initalize starting position */
+		void initCircle(double x, double y, double theta, double std[]);
+		void initSquare(float x, float y, float theta);
 
-		void init_circle(double x, double y, double theta, double std[]);
-		void init_square(float x, float y, float theta);
-
+		/* prediction of particle movement */
 		void prediction(float x, float y, float theta);
 
-		void updateWeights(double std_landmark[], std::vector<LandmarkObs> observations, Map map_landmarks);
+		/* nearest neighbor matching */
+		void dataAssociation(vector<LandmarkObs> landmarks_ref, vector<LandmarkObs>& transform);
 		
+		/* update weight */
+		void updateWeights(double std_landmark[], vector<LandmarkObs> observations, Map map_landmarks);
+		
+		/* resampling */
+		void resampling();	
+
 		const bool initialized() const {
 			return is_initialized;
 		}

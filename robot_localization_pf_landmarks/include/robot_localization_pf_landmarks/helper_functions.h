@@ -19,7 +19,7 @@ inline double dist(double x1, double y1, double x2, double y2)
 
 inline bool read_map_data(std::string filename, Map &map)
 {
-	// Get file of map:
+	/* Get file of map */
 	std::ifstream in_file_map(filename.c_str(), std::ifstream::in);
 	if (!in_file_map) return false;
 
