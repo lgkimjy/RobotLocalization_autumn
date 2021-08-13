@@ -18,6 +18,7 @@
 
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <ros/console.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/Twist.h>
 #include <alice_msgs/FoundObject.h>
@@ -34,6 +35,13 @@ void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr& msg);
 void bodydeltaCallback(const geometry_msgs::Twist::ConstPtr& msg);
 void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg);
 
+struct LandmarkObs {
+	
+	int id;		// Id of matching landmark in the map.
+	double x;	// Local (vehicle coordinates) x position of landmark observation [m]
+	double y;	// Local (vehicle coordinates) y position of landmark observation [m]
+};
+
 struct Particle{
 	int id;
 	double x;
@@ -46,19 +54,14 @@ class ParticleFilter{
 
 	public:
 
-		// Number of particles to draw
 		int num_particles;
-		// Flag, if filter is initialized
 		bool is_initialized;
-		// Vector of weights of all particles
 		std::vector<double> weights;
-		// Set of current particles
 		std::vector<Particle> particles;
 
-		// Constructor
-		ParticleFilter() : num_particles(0), is_initialized(false) {}
-		// Destructor
-		~ParticleFilter() {}
+		ParticleFilter():num_particles(0), is_initialized(false){}
+
+		~ParticleFilter(){}
 
 		float getRandom(float low, float high);
 		float getRandomGaussian(float mean, float sigma);
@@ -67,8 +70,8 @@ class ParticleFilter{
 		void init_square(float x, float y, float theta);
 
 		void prediction(float x, float y, float theta);
-		
-		void resample();
+
+		void updateWeights(double std_landmark[], std::vector<LandmarkObs> observations, Map map_landmarks);
 		
 		const bool initialized() const {
 			return is_initialized;
