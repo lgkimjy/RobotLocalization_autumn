@@ -3,12 +3,10 @@
 <launch>
 
     <!-- Receive -->
-    <node name="zed_receive" pkg="robot_localization_zed_receive" type="robot_localization_zed_receive"/>
-    <node name="head_receive" pkg="robot_localization_head_receive" type="robot_localization_head_receive2"/>
-    <node name="move" pkg="robot_localization_move" type="robot_localization_move"/>
+    <node name="head_receive" pkg="robot_localization_head_receive" type="robot_localization_head_receive3"/>
     
     <!-- particle filter -->
-    <node name="particle_filter" pkg="robot_localization_particlefilter" type="robot_localization_particlefilter"/>
+    <node name="particle_filter" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks" output="screen"/>
 
     <!-- reposition -->
     <node name="reposition" pkg="robot_localization_setposition" type="robot_localization_setposition.py"/>

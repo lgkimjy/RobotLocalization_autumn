@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+
+<launch>
+
+	<param name="robot_id" value="Keeper" />
+        <param name="gui_mode" value="off" />
+        <param name="gui_mode" value="$(arg gui_mode)" />
+	<node name="kinematic_only" pkg="robot_localization_kinematic_only_move" type="robot_localization_kinematic_only_move" output='screen'/>
+
+</launch>
+
