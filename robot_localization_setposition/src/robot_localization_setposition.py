@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 import rospy
 import math
 from alice_ft_sensor_msgs.msg import ForceTorque
