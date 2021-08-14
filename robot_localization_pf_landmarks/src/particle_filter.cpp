@@ -33,7 +33,7 @@ double ParticleFilter::multivGaussian(double sig_x, double sig_y, double x_obs, 
 
 void ParticleFilter::initSquare(float x, float y, float theta)
 {
-    num_particles = 1;
+    num_particles = 500;
 
     float repos_range_x[2] = {x - 2 / 2, x + 2 / 2};
     float repos_range_y[2] = {y - 2 / 2, y + 2 / 2};
@@ -106,7 +106,7 @@ void ParticleFilter::prediction(float move_x, float move_y, float move_w)
     }
 }
 
-void ParticleFilter::dataAssociation(vector<LandmarkObs> landmarks_ref, vector<LandmarkObs> &observations)
+void ParticleFilter::dataAssociation(vector<LandmarkObs> landmarks_ref, vector<LandmarkObs>& observations)
 {
     for(int i = 0; i < observations.size(); i++)
     {
@@ -124,9 +124,10 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> landmarks_ref, vector<L
         }
         observations[i].id = map_id;
     }
+
 }
 
-void ParticleFilter::updateWeights(double std_landmark[], vector<LandmarkObs> observations, Map map_landmarks)
+void ParticleFilter::updateWeights(double std_landmark[], vector<LandmarkObs>& observations, Map map_landmarks)
 {
     for (int i = 0; i < num_particles; i++)
     {
@@ -169,6 +170,7 @@ void ParticleFilter::updateWeights(double std_landmark[], vector<LandmarkObs> ob
             obs_y = transformed_obs[j].y;
 
             int associated_landmark = transformed_obs[j].id;
+            observations[j].id = associated_landmark;
 
             for(unsigned int k=0; k < landmarks_ref.size();k++){
                 if(landmarks_ref[k].id == associated_landmark){
@@ -182,39 +184,38 @@ void ParticleFilter::updateWeights(double std_landmark[], vector<LandmarkObs> ob
     }
 }
 
-// void ParticleFilter::resampling()
-// {
-//     vector<Particle> new_particles;
+void ParticleFilter::resampling()
+{
+    vector<Particle> new_particles;
 
-//     // get all of the current weights
-//     vector<double> weights;
-//     for (int i = 0; i < num_particles; i++){
-//         weights.push_back(particles[i].weight);
-//     }
+    // get all of the current weights
+    vector<double> weights;
+    for(int i = 0; i < num_particles; i++){
+        weights.push_back(particles[i].weight);
+    }
 
-//     // generate random starting index for resampling wheel
-//     uniform_int_distribution<int> uniintdist(0, num_particles - 1);
-//     auto index = uniintdist(gen);
+    // generate random starting index for resampling wheel
+    uniform_int_distribution<int> uniintdist(0, num_particles - 1);
+    auto index = uniintdist(gen);
 
-//     // get max weight
-//     double max_weight = *max_element(weights.begin(), weights.end());
+    // get max weight
+    double max_weight = *max_element(weights.begin(), weights.end());
 
-//     // uniform random distribution [0.0, max_weight)
-//     uniform_real_distribution<double> unirealdist(0.0, max_weight);
+    // uniform random distribution [0.0, max_weight)
+    uniform_real_distribution<double> unirealdist(0.0, max_weight);
 
-//     double beta = 0.0;
+    double beta = 0.0;
 
-//     // spin the resample wheel!
-//     for(int i = 0; i < num_particles; i++)
-//     {
-//         beta += unirealdist(gen) * 2.0;
-//         while (beta > weights[index])
-//         {
-//             beta -= weights[index];
-//             index = (index + 1) % num_particles;
-//         }
-//         new_particles.push_back(particles[index]);
-//     }
+    // spin the resample wheel!
+    for(int i = 0; i < num_particles; i++)
+    {
+        beta += unirealdist(gen) * 2.0;
+        while (beta > weights[index]){
+            beta -= weights[index];
+            index = (index + 1) % num_particles;
+        }
+        new_particles.push_back(particles[index]);
+    }
 
-//     particles = new_particles;
-// }
+    particles = new_particles;
+}

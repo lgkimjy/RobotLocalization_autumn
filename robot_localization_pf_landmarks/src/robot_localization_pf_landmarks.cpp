@@ -82,11 +82,9 @@ int main(int argc, char **argv)
         // }
         // cout << endl;
 
-
         /* Update the weights and resample */
         pf.updateWeights(sigma_landmark, observations, map);
-        // pf.resampling();
-
+        pf.resampling();
 
         robot_pos_msg.x = sum_x - 5.2;
         robot_pos_msg.y = sum_y - 3.7;
@@ -98,14 +96,25 @@ int main(int argc, char **argv)
         robotpos_pub.publish(robot_pos_msg);
 
         /* visualize */
-        /* visualize landmark based on kinematic calculated pos, kinematics_odom */
         Mat localization_img = color_map_image.clone();
+        /* visualize landmark based on kinematic calculated pos, kinematics_odom */
+        for(int i = 0; i < pf.particles.size(); i++){
+            for(int j = 0; j < observations.size(); j++){
+                double t_x = cos(pf.particles[i].theta) * observations[j].x - sin(pf.particles[i].theta) * observations[j].y + pf.particles[i].x;
+                double t_y = sin(pf.particles[i].theta) * observations[j].x + cos(pf.particles[i].theta) * observations[j].y + pf.particles[i].y;
+                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
+                circle(localization_img, ld_point, 10, Scalar(0, 255, 255), -1);
+                putText(localization_img, to_string(observations[j].id), (ld_point), 1, 1.2, (255,0,0), 2, true);
+            }
+        }
+        /* visualize landmark based on kinematic calculated pos, kinematics_odom */
         for(int i = 0; i < observations.size(); i++){
             double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
             double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
             Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
             circle(localization_img, ld_point, 10, Scalar(0, 0, 255), -1);
         }
+
         /* visualize particle pos */
         for(int i = 0; i < pf.particles.size(); i++){
             // ROS_INFO("Particle Pos : %3.2f, %3.2f, %2.3f", pf.particles[i].x, pf.particles[i].y, pf.particles[i].theta);              // real world

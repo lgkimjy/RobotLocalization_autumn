@@ -75,7 +75,7 @@ class ParticleFilter{
 		void dataAssociation(vector<LandmarkObs> landmarks_ref, vector<LandmarkObs>& transform);
 		
 		/* update weight */
-		void updateWeights(double std_landmark[], vector<LandmarkObs> observations, Map map_landmarks);
+		void updateWeights(double std_landmark[], vector<LandmarkObs>& observations, Map map_landmarks);
 		
 		/* resampling */
 		void resampling();	
