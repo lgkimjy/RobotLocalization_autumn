@@ -68,8 +68,8 @@ class ParticleFilter{
 		void initCircle(double x, double y, double theta, double std[]);
 		void initSquare(float x, float y, float theta);
 
-		/* prediction of particle movement */
-		void prediction(float x, float y, float theta);
+		/* prediction of noisy particle movement */
+		void noisyMove(float x, float y, float theta);
 
 		/* nearest neighbor matching */
 		void dataAssociation(vector<LandmarkObs> landmarks_ref, vector<LandmarkObs>& transform);

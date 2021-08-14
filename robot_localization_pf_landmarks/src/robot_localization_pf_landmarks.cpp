@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         if(flag_move == true)
         {
             /* particle movement */
-            pf.prediction(delta_x, delta_y, delta_w);
+            pf.noisyMove(delta_x, delta_y, delta_w);
 
             /* summation of alice ideal body delta */
             sum_x += (cos(sum_theta) * delta_x + sin(sum_theta) * delta_y);
@@ -86,9 +86,27 @@ int main(int argc, char **argv)
         pf.updateWeights(sigma_landmark, observations, map);
         pf.resampling();
 
-        robot_pos_msg.x = sum_x - 5.2;
-        robot_pos_msg.y = sum_y - 3.7;
-        robot_pos_msg.theta = sum_theta;
+		/* Calculate and output the best particle weight */
+		vector<Particle> particles = pf.particles;
+		int num_particles = particles.size();
+		double highest_weight = 0.0;
+		Particle best_particle;
+		for (int i = 0; i < num_particles; ++i) {
+			if (particles[i].weight > highest_weight) {
+				highest_weight = particles[i].weight;
+				best_particle = particles[i];
+			}
+		}
+
+        /* Kinematics position */
+        // robot_pos_msg.x = sum_x - 5.2;
+        // robot_pos_msg.y = sum_y - 3.7;
+        // robot_pos_msg.theta = sum_theta;
+
+        /* PF predicted position */
+        robot_pos_msg.x = best_particle.x - 5.2;
+        robot_pos_msg.y = best_particle.y - 3.7;
+        robot_pos_msg.theta = fmodf(best_particle.theta + M_PI * 2.0, M_PI * 2.0);
 
         // ROS_INFO("Robot Kinematics : %3.2f, %3.2f, %2.3f", sum_x, sum_y, sum_theta);                                   // real world
         // ROS_INFO("Robot Kinematics : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta);     // global world
@@ -124,6 +142,7 @@ int main(int argc, char **argv)
             arrowedLine(localization_img, point, Point2f(point.x + 10 * cos(pf.particles[i].theta), point.y + 10 * -sin(pf.particles[i].theta)), Scalar(0, 0, 255), 5);
         }
         /* visualize robot pos */
+        // Point2f robot_point = Point2f(robot_pos_msg.x * 100 + localization_img.size().width / 2, localization_img.size().height - robot_pos_msg.y * 100 - localization_img.size().height / 2);
         Point2f robot_point = Point2f(robot_pos_msg.x * 100 + localization_img.size().width / 2, localization_img.size().height - robot_pos_msg.y * 100 - localization_img.size().height / 2);
         circle(localization_img, robot_point, 10, Scalar(255, 0, 0), -1);
         arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 10 * cos(robot_pos_msg.theta), robot_point.y + 10 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 5);

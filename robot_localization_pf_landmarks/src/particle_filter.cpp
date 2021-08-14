@@ -85,7 +85,7 @@ void ParticleFilter::initCircle(double x, double y, double theta, double std[])
     is_initialized = true;
 }
 
-void ParticleFilter::prediction(float move_x, float move_y, float move_w)
+void ParticleFilter::noisyMove(float move_x, float move_y, float move_w)
 {
     for (int i = 0; i < num_particles; i++)
     {
