@@ -6,6 +6,7 @@ use known keypoints monte carlo localzation algorithm
 ## Detection 
 roslaunch zed_wrapper zed.launch
 roslaunch darknet_ros darknet_ros.launch
+rosrun alice_vision alice_vision_node
 
 ## Robot Localization
 rosrun robot_localization_pf_landmarks robot_localization_pf_landmarks
