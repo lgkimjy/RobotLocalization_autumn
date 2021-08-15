@@ -58,8 +58,8 @@ int main(int argc, char **argv)
             if(mode == "PF"){
                 pf.particles.clear();
                 ROS_INFO("[robot_localization_pf_landmark] Initalize robot start position and particles random start position");
-                // pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
-                pf.initSquare(repos_x, repos_y, repos_w);
+                pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
+                // pf.initSquare(repos_x, repos_y, repos_w);
             }
             /* reposition for kinematics only movement */
             sum_x = repos_x;
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
                         double t_x = cos(pf.particles[i].theta) * observations[j].x - sin(pf.particles[i].theta) * observations[j].y + pf.particles[i].x;
                         double t_y = sin(pf.particles[i].theta) * observations[j].x + cos(pf.particles[i].theta) * observations[j].y + pf.particles[i].y;
                         Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                        circle(localization_img, ld_point, 10, Scalar(0, 255, 255), -1);
+                        circle(localization_img, ld_point, 7, Scalar(0, 255, 255), -1);
                         putText(localization_img, to_string(observations[j].id), (ld_point), 1, 1.2, (255,0,0), 2, true);
                     }
                 }
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
                 double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
                 double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
                 Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                circle(localization_img, ld_point, 10, Scalar(0, 0, 255), -1);
+                circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
             }
 
             if(mode == "PF"){
@@ -152,13 +152,15 @@ int main(int argc, char **argv)
                     // ROS_INFO("Particle Pos : %3.2f, %3.2f, %2.3f", pf.particles[i].x - 5.2, pf.particles[i].y - 3.7, pf.particles[i].theta);  // gloabl world
                     Point2f point = Point2f(pf.particles[i].x * 100, localization_img.size().height - pf.particles[i].y * 100);
                     circle(localization_img, point, 10, Scalar(0, 255, 255), -1);
-                    arrowedLine(localization_img, point, Point2f(point.x + 10 * cos(pf.particles[i].theta), point.y + 10 * -sin(pf.particles[i].theta)), Scalar(0, 0, 255), 5);
+                    arrowedLine(localization_img, point, Point2f(point.x + 10 * cos(pf.particles[i].theta), point.y + 10 * -sin(pf.particles[i].theta)), Scalar(0, 0, 255), 3);
                 }
             }
             /* visualize robot pos */
             Point2f robot_point = Point2f(robot_pos_msg.x * 100 + localization_img.size().width / 2, localization_img.size().height - robot_pos_msg.y * 100 - localization_img.size().height / 2);
-            circle(localization_img, robot_point, 10, Scalar(255, 0, 0), -1);
-            arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 10 * cos(robot_pos_msg.theta), robot_point.y + 10 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 5);
+            circle(localization_img, robot_point, 12, Scalar(255, 0, 0), -1);
+            arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_msg.theta), robot_point.y + 12 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
+
+            observations.clear();
 
             imshow("localization image", localization_img);
             waitKey(1);
