@@ -34,8 +34,9 @@ int main(int argc, char **argv)
 
     ros::Publisher robotpos_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos", 10);
 
-    namedWindow("localization image", WINDOW_FULLSCREEN);
-
+    namedWindow("localization image", CV_WINDOW_NORMAL);
+    if(gui_mode == "on_alice"){cvSetWindowProperty("localization image", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);}
+    
     /* noise generation */
     double sigma_pos[3] = {0.25, 0.25, 1.57}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
     double sigma_landmark[2] = {0.3, 0.3};    // Landmark measurement uncertainty [x [m], y [m]]

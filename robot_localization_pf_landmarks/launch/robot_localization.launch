@@ -4,10 +4,10 @@
 
 
     <!-- Receive -->
-    <!-- <node name="head_receive" pkg="robot_localization_head_receive" type="robot_localization_head_receive3"/> -->
+    <node name="head_receive" pkg="robot_localization_head_receive" type="robot_localization_head_receive3"/>
 
     <!-- reposition -->
-    <!-- <node name="reposition" pkg="robot_localization_setposition" type="robot_localization_setposition.py"/> -->
+    <node name="reposition" pkg="robot_localization_setposition" type="robot_localization_setposition.py"/>
 
     <!-- particle filter -->
     <arg name="mode" default="PF" />
