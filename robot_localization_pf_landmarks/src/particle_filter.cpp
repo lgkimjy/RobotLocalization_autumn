@@ -33,7 +33,7 @@ double ParticleFilter::multivGaussian(double sig_x, double sig_y, double x_obs, 
 
 void ParticleFilter::initSquare(float x, float y, float theta)
 {
-    num_particles = 2000;
+    num_particles = 1000;
 
     float repos_range_x[2] = {x - 2 / 2, x + 2 / 2};
     float repos_range_y[2] = {y - 2 / 2, y + 2 / 2};
@@ -57,7 +57,7 @@ void ParticleFilter::initSquare(float x, float y, float theta)
 
 void ParticleFilter::initCircle(double x, double y, double theta, double std[])
 {
-    num_particles = 2000;
+    num_particles = 1000;
 
     /* define normal distributions for sensor noise */
     normal_distribution<double> N_x_init(0, std[0]);
@@ -124,7 +124,6 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> landmarks_ref, vector<L
         }
         observations[i].id = map_id;
     }
-
 }
 
 void ParticleFilter::updateWeights(double std_landmark[], vector<LandmarkObs>& observations, Map map_landmarks)

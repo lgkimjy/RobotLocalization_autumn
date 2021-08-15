@@ -61,6 +61,7 @@ int main(int argc, char **argv)
                 ROS_INFO("[robot_localization_pf_landmark] Initalize robot start position and particles random start position");
                 pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
                 // pf.initSquare(repos_x, repos_y, repos_w);
+                best_particle = Particle{0, repos_x, repos_y, repos_w, 1.0};
             }
             /* reposition for kinematics only movement */
             sum_x = repos_x;
@@ -81,25 +82,26 @@ int main(int argc, char **argv)
             sum_theta += delta_w;
 
             flag_move = false;
-        }
+            
+            if(mode == "PF"){
+                /* Update the weights and resample */
+                pf.updateWeights(sigma_landmark, observations, map);
+                pf.resampling();
 
-        if(mode == "PF"){
-            /* Update the weights and resample */
-            pf.updateWeights(sigma_landmark, observations, map);
-            pf.resampling();
-
-            /* Calculate and output the best particle weight */
-            vector<Particle> particles = pf.particles;
-            int num_particles = particles.size();
-            double highest_weight = 0.0;
-            // Particle best_particle;
-            for (int i = 0; i < num_particles; ++i) {
-                if (particles[i].weight > highest_weight) {
-                    highest_weight = particles[i].weight;
-                    best_particle = particles[i];
+                /* Calculate and output the best particle weight */
+                vector<Particle> particles = pf.particles;
+                int num_particles = particles.size();
+                double highest_weight = 0.0;
+                // Particle best_particle;
+                for (int i = 0; i < num_particles; ++i) {
+                    if (particles[i].weight > highest_weight) {
+                        highest_weight = particles[i].weight;
+                        best_particle = particles[i];
+                    }
                 }
             }
         }
+
 
         if(mode == "kinematics"){
             /* Kinematics position */
