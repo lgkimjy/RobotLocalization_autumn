@@ -144,12 +144,14 @@ int main(int argc, char **argv)
                     }
                 }
             }
-            /* visualize landmark based on kinematic calculated pos, kinematics_odom */
-            for(int i = 0; i < observations.size(); i++){
-                double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
-                double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
-                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
+            else if(mode == "kinematics"){
+                /* visualize landmark based on kinematic calculated pos, kinematics_odom */
+                for(int i = 0; i < observations.size(); i++){
+                    double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
+                    double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
+                    Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
+                    circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
+                }
             }
 
             if(mode == "PF"){
