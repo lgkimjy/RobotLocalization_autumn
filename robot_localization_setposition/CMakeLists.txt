@@ -12,6 +12,6 @@ catkin_package(
   DEPENDS system_lib
 )
 
-catkin_install_python(PROGRAMS src/robot_localization_setposition.py src/robot_localization_setposition_player.py src/robot_localization_setposition_keeper.py
+catkin_install_python(PROGRAMS src/robot_localization_setposition.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
