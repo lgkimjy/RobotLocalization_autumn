@@ -13,11 +13,11 @@ destination = None
 left_foot_torque = None
 right_foot_torque = None
 
-left_start = [4.5, 0.87, math.pi/2.0]
-right_start = [11.5, 0.87, math.pi/2.0]
+left_start = [2.8, 0.7, math.pi/2.0]
+right_start = [7.6, 0.7, math.pi/2.0]
 
-left_offense_start  = [6.5, 5.5, 0]
-right_offense_start = [9.5, 5.5, math.pi]
+left_offense_start  = [4.45, 3.7, 0]
+right_offense_start = [5.95, 3.7, math.pi]
     
 destination = [8.0, 5.5, 0]
 # destination = [0, 0, 0]
