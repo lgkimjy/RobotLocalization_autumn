@@ -10,6 +10,7 @@ float sum_theta = 0, sum_x = 0, sum_y = 0;
 
 string color_image_map_path = ros::package::getPath("robot_localization_data") + "/map/soccer_field.jpg";
 Mat color_map_image = imread(color_image_map_path.c_str());
+Mat log_image = color_map_image.clone();
 
 ParticleFilter pf;
 Particle best_particle;
@@ -18,6 +19,9 @@ bool flag_move;
 
 string mode;
 string gui_mode;
+
+time_t curTime = time(NULL);
+struct tm *pLocal = localtime(&curTime);
 
 int main(int argc, char **argv)
 {
@@ -59,8 +63,8 @@ int main(int argc, char **argv)
             if(mode == "PF"){
                 pf.particles.clear();
                 ROS_INFO("[robot_localization_pf_landmark] Initalize robot start position and particles random start position");
-                pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
-                // pf.initSquare(repos_x, repos_y, repos_w);
+                // pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
+                pf.initSquare(repos_x, repos_y, repos_w);
                 best_particle = Particle{0, repos_x, repos_y, repos_w, 1.0};
             }
             /* reposition for kinematics only movement */
@@ -76,13 +80,7 @@ int main(int argc, char **argv)
                 /* particle movement */
                 pf.noisyMove(delta_x, delta_y, delta_w);
             }
-            /* summation of alice ideal body delta */
-            sum_x += (cos(sum_theta) * delta_x + sin(sum_theta) * delta_y);
-            sum_y += (sin(sum_theta) * delta_x + cos(sum_theta) * delta_y);
-            sum_theta += delta_w;
 
-            flag_move = false;
-            
             if(mode == "PF"){
                 /* Update the weights and resample */
                 pf.updateWeights(sigma_landmark, observations, map);
@@ -100,8 +98,14 @@ int main(int argc, char **argv)
                     }
                 }
             }
-        }
 
+            /* summation of alice ideal body delta */
+            sum_x += (cos(sum_theta) * delta_x + sin(sum_theta) * delta_y);
+            sum_y += (sin(sum_theta) * delta_x + cos(sum_theta) * delta_y);
+            sum_theta += delta_w;
+
+            flag_move = false;
+        }
 
         if(mode == "kinematics"){
             /* Kinematics position */
@@ -151,8 +155,6 @@ int main(int argc, char **argv)
             if(mode == "PF"){
                 /* visualize particle pos */
                 for(int i = 0; i < pf.particles.size(); i++){
-                    // ROS_INFO("Particle Pos : %3.2f, %3.2f, %2.3f", pf.particles[i].x, pf.particles[i].y, pf.particles[i].theta);              // real world
-                    // ROS_INFO("Particle Pos : %3.2f, %3.2f, %2.3f", pf.particles[i].x - 5.2, pf.particles[i].y - 3.7, pf.particles[i].theta);  // gloabl world
                     Point2f point = Point2f(pf.particles[i].x * 100, localization_img.size().height - pf.particles[i].y * 100);
                     circle(localization_img, point, 10, Scalar(0, 255, 255), -1);
                     arrowedLine(localization_img, point, Point2f(point.x + 10 * cos(pf.particles[i].theta), point.y + 10 * -sin(pf.particles[i].theta)), Scalar(0, 0, 255), 3);
@@ -163,6 +165,9 @@ int main(int argc, char **argv)
             circle(localization_img, robot_point, 12, Scalar(255, 0, 0), -1);
             arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_msg.theta), robot_point.y + 12 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
 
+            circle(log_image, robot_point, 6, Scalar(255, 0, 0), -1);
+            arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_msg.theta), robot_point.y + 6 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
+
             observations.clear();
 
             imshow("localization image", localization_img);
@@ -172,10 +177,14 @@ int main(int argc, char **argv)
 
         ros::spinOnce();
         loop_rate.sleep();
+
     }
+    imwrite(ros::package::getPath("robot_localization_data") + "/logs/odom-"+to_string(pLocal->tm_mday)+"-"+to_string(pLocal->tm_hour)+"-"
+                                                                           +to_string(pLocal->tm_min)+".JPG", log_image);
+    ROS_INFO("[robot_localization_pf_landmark] Success save log data");  
 
     return 0;
-}
+} 
 
 void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr &msg)
 {

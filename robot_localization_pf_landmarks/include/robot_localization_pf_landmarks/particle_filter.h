@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <numeric>
 #include <random>
+#include <ctime>
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -68,8 +69,9 @@ class ParticleFilter{
 		void initCircle(double x, double y, double theta, double std[]);
 		void initSquare(float x, float y, float theta);
 
-		/* prediction of noisy particle movement */
+		/* prediction of particle movement w/ w/o noisy data */
 		void noisyMove(float x, float y, float theta);
+		void Move(float x, float y, float theta);
 
 		/* nearest neighbor matching */
 		void dataAssociation(vector<LandmarkObs> landmarks_ref, vector<LandmarkObs>& transform);
