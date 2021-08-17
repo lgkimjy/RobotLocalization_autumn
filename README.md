@@ -23,5 +23,5 @@ theta: 0.0 / 1.57"
 
 ### Data Record
 ```
-rosbag record -o filename.bag /alice/ideal_body_delta /alice/vision/detected_objects /alice/moving_status /rosout /rosout_agg
+rosbag record -o filename.bag /alice/ideal_body_delta /alice/vision/detected_objects /alice/moving_status /robotis/present_joint_states /rosout /rosout_agg
 ```
