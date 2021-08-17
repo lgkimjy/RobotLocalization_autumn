@@ -79,20 +79,25 @@ int main(int argc, char **argv)
         if(flag_move == true)
         {
             if(mode == "PF"){
-                /* particle movement */
-                pf.noisyMove(delta_x, delta_y, delta_w);
                 
+                /* if keypoints are not detected more than 3, only use kinematics */
                 if(observations.size() <= 3){
                     best_particle.x += (cos(best_particle.theta) * delta_x + sin(best_particle.theta) * delta_y);
                     best_particle.y += (sin(best_particle.theta) * delta_x + cos(best_particle.theta) * delta_y);
                     best_particle.theta += delta_w;
+                    pf.particles.clear();
                     obs_count++;
                 }
-                else{
+                else
+                {
+                    /* observation detected after non-detection situation, it will re-initalize particle filter */
                     if(obs_count > 0){
                         pf.initCircle(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
                         obs_count = 0;
                     }
+                    /* particle movement */
+                    pf.noisyMove(delta_x, delta_y, delta_w);
+
                     /* Update the weights and resample */
                     pf.updateWeights(sigma_landmark, observations, map);
                     pf.resampling();
