@@ -23,6 +23,8 @@ string gui_mode;
 time_t curTime = time(NULL);
 struct tm *pLocal = localtime(&curTime);
 
+int obs_count = 0;
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "robot_localization_pf_landmark");
@@ -79,26 +81,35 @@ int main(int argc, char **argv)
             if(mode == "PF"){
                 /* particle movement */
                 pf.noisyMove(delta_x, delta_y, delta_w);
-            }
+                
+                if(observations.size() <= 3){
+                    best_particle.x += (cos(best_particle.theta) * delta_x + sin(best_particle.theta) * delta_y);
+                    best_particle.y += (sin(best_particle.theta) * delta_x + cos(best_particle.theta) * delta_y);
+                    best_particle.theta += delta_w;
+                    obs_count++;
+                }
+                else{
+                    if(obs_count > 0){
+                        pf.initCircle(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
+                        obs_count = 0;
+                    }
+                    /* Update the weights and resample */
+                    pf.updateWeights(sigma_landmark, observations, map);
+                    pf.resampling();
 
-            if(mode == "PF"){
-                /* Update the weights and resample */
-                pf.updateWeights(sigma_landmark, observations, map);
-                pf.resampling();
-
-                /* Calculate and output the best particle weight */
-                vector<Particle> particles = pf.particles;
-                int num_particles = particles.size();
-                double highest_weight = 0.0;
-                // Particle best_particle;
-                for (int i = 0; i < num_particles; ++i) {
-                    if (particles[i].weight > highest_weight) {
-                        highest_weight = particles[i].weight;
-                        best_particle = particles[i];
+                    /* Calculate and output the best particle weight */
+                    vector<Particle> particles = pf.particles;
+                    int num_particles = particles.size();
+                    double highest_weight = 0.0;
+                    // Particle best_particle;
+                    for (int i = 0; i < num_particles; ++i) {
+                        if (particles[i].weight > highest_weight) {
+                            highest_weight = particles[i].weight;
+                            best_particle = particles[i];
+                        }
                     }
                 }
             }
-
             /* summation of alice ideal body delta */
             sum_x += (cos(sum_theta) * delta_x + sin(sum_theta) * delta_y);
             sum_y += (sin(sum_theta) * delta_x + cos(sum_theta) * delta_y);
@@ -152,6 +163,7 @@ int main(int argc, char **argv)
                     Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
                     circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
                 }
+
             }
 
             if(mode == "PF"){
