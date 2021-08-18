@@ -35,8 +35,8 @@ void ParticleFilter::initSquare(float x, float y, float theta)
 {
     num_particles = 1000;
 
-    float repos_range_x[2] = {x - 0.55, x + 0.55};
-    float repos_range_y[2] = {y - 0.55, y + 0.55};
+    float repos_range_x[2] = {x - 0.5, x + 0.5};
+    float repos_range_y[2] = {y - 0.5, y + 0.5};
     float repos_range_w[2] = {theta - 3.14 / 2, theta + 3.14 / 2};
 
     /* init particles */
@@ -77,7 +77,8 @@ void ParticleFilter::initCircle(double x, double y, double theta, double std[])
         /* add noise */
         p.x += N_x_init(gen);
         p.y += N_y_init(gen);
-        p.theta += N_theta_init(gen);
+        // p.theta += N_theta_init(gen);
+        p.theta += getRandom(theta-1, theta+1);
 
         particles.push_back(p);
     }

@@ -15,8 +15,10 @@ Mat log_image = color_map_image.clone();
 ParticleFilter pf;
 Particle best_particle;
 vector<LandmarkObs> observations;
+LandmarkObs ball;
 bool flag_move;
 
+string status = "stop";
 string mode;
 string gui_mode;
 
@@ -34,6 +36,7 @@ int main(int argc, char **argv)
     nh.getParam("/mode", mode);
     nh.getParam("/gui_mode", gui_mode);
 
+    ros::Subscriber sub_status = nh.subscribe("/alice/moving_status", 10, statusCallback);
     ros::Subscriber reposition_sub = nh.subscribe("/alice/reposition", 10, RePositionCallback);
     ros::Subscriber sub_referencbody = nh.subscribe("/alice/ideal_body_delta", 10, bodydeltaCallback);
     ros::Subscriber sub_landmark = nh.subscribe("/alice/vision/detected_objects", 10, landmarkCallback);
@@ -90,6 +93,11 @@ int main(int argc, char **argv)
 
         if(flag_move == true)
         {
+            if(status == "left" || status == "right"){
+                delta_x *= -1;
+                delta_y *= -1;
+            }
+
             if(mode == "PF"){
                 
                 /* if keypoints are not detected more than 3, only use kinematics */
@@ -159,7 +167,7 @@ int main(int argc, char **argv)
         if(gui_mode == "on_alice" || gui_mode == "on" || gui_mode=="nuc")
         {
             Mat localization_img = color_map_image.clone();
-            
+        
             if(mode == "PF"){
                 /* visualize landmark based on kinematic calculated pos, kinematics_odom */
                 for(int i = 0; i < pf.particles.size(); i++){
@@ -171,6 +179,10 @@ int main(int argc, char **argv)
                         putText(localization_img, to_string(observations[j].id), (ld_point), 1, 1.2, (255,0,0), 2, true);
                     }
                 }
+                double t_x = cos(best_particle.theta) * ball.x - sin(best_particle.theta) * ball.y + best_particle.x;
+                double t_y = sin(best_particle.theta) * ball.x + cos(best_particle.theta) * ball.y + best_particle.y;
+                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
+                circle(localization_img, ld_point, 10, Scalar(100,100,255), -1);
             }
             else if(mode == "kinematics"){
                 /* visualize landmark based on kinematic calculated pos, kinematics_odom */
@@ -180,7 +192,10 @@ int main(int argc, char **argv)
                     Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
                     circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
                 }
-
+                double t_x = cos(sum_theta) * ball.x - sin(sum_theta) * ball.y + sum_x;
+                double t_y = sin(sum_theta) * ball.x + cos(sum_theta) * ball.y + sum_y;
+                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
+                circle(localization_img, ld_point, 10, Scalar(100,100,255), -1);
             }
 
             if(mode == "PF"){
@@ -196,10 +211,13 @@ int main(int argc, char **argv)
             circle(localization_img, robot_point, 12, Scalar(255, 0, 0), -1);
             arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_msg.theta), robot_point.y + 12 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
 
+            /* log images */
             circle(log_image, robot_point, 6, Scalar(255, 0, 0), -1);
             arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_msg.theta), robot_point.y + 6 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
 
+            /* clear and re-initialize */
             observations.clear();
+            ball = LandmarkObs{};
 
             /* publish fully drawn images to web socket */
             sensor_msgs::Image ros_localization_img = image2message(localization_img);
@@ -251,6 +269,10 @@ void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr &msg)
             obs.y = msg->data[i].pos.y;
             observations.push_back(obs);
         }
+        else if(msg->data[i].name == "ball"){
+            ball.x = msg->data[i].pos.x;
+            ball.y = msg->data[i].pos.y;
+        }
         else
             continue;
     }
@@ -271,4 +293,9 @@ sensor_msgs::Image image2message(Mat image)
     sensor_msgs::Image ros_image;
     cv_image.toImageMsg(ros_image);
     return ros_image;
+}
+
+void statusCallback(const std_msgs::String::ConstPtr& msg)
+{
+    status = msg->data;
 }

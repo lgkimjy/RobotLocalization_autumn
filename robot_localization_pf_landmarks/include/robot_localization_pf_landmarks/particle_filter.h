@@ -22,6 +22,7 @@
 #include <geometry_msgs/Twist.h>
 #include <alice_msgs/FoundObject.h>
 #include <alice_msgs/FoundObjectArray.h>
+#include <std_msgs/String.h>
 
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
@@ -33,6 +34,7 @@ void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr& msg);
 void bodydeltaCallback(const geometry_msgs::Twist::ConstPtr& msg);
 void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg);
 sensor_msgs::Image image2message(Mat image);
+void statusCallback(const std_msgs::String::ConstPtr& msg);
 
 
 struct LandmarkObs {
