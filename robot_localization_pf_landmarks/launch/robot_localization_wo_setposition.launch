@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+
+
+    <!-- Receive -->
+    <node name="head_receive" pkg="robot_localization_head_receive" type="robot_localization_head_receive3"/>
+
+    <!-- reposition -->
+    <!-- <node name="reposition" pkg="robot_localization_setposition" type="robot_localization_setposition.py"/> -->
+
+    <!-- particle filter -->
+    <arg name="mode" default="PF" />
+    <arg name="gui_mode" default="nuc" />
+    <param name="mode" value="$(arg mode)" />
+    <param name="gui_mode" value="$(arg gui_mode)" />
+    
+    <!-- <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks" output="screen"/> -->
+    <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks"/>
+
+    <!-- Web Streaming -->
+    <node name="mjpeg_server" pkg="mjpeg_server" type="mjpeg_server"/> 
+
+</launch>
