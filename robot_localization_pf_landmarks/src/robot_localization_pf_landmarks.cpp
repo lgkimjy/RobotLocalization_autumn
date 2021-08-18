@@ -41,8 +41,19 @@ int main(int argc, char **argv)
     ros::Publisher robotpos_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos", 10);
     ros::Publisher localization_image_pub = nh.advertise<sensor_msgs::Image>("/robot_localization/localization_image", 10);
 
-    namedWindow("localization image", CV_WINDOW_NORMAL);
-    if(gui_mode == "on_alice"){cvSetWindowProperty("localization image", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);}
+    #if(CV_MAJOR_VERSION <= 3)
+    {
+        // for opencv 3.4.0 user
+        namedWindow("localization image", CV_WINDOW_NORMAL);
+        if(gui_mode == "on_alice"){cvSetWindowProperty("localization image", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);}
+    }
+    #else
+    {
+        // for opencv 4.1.1 user
+        namedWindow("localization image", CV_RAND_NORMAL);
+    }
+    #endif
+
     
     /* noise generation */
     double sigma_pos[3] = {0.25, 0.25, 1.57}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
@@ -145,7 +156,7 @@ int main(int argc, char **argv)
         robotpos_pub.publish(robot_pos_msg);
 
         /* visualize */
-        if(gui_mode == "on_alice" || gui_mode == "on")
+        if(gui_mode == "on_alice" || gui_mode == "on" || gui_mode=="nuc")
         {
             Mat localization_img = color_map_image.clone();
             
@@ -193,9 +204,11 @@ int main(int argc, char **argv)
             /* publish fully drawn images to web socket */
             sensor_msgs::Image ros_localization_img = image2message(localization_img);
             localization_image_pub.publish(ros_localization_img);
-
-            imshow("localization image", localization_img);
-            waitKey(1);
+            
+            if(gui_mode!="nuc"){
+                imshow("localization image", localization_img);
+                waitKey(1);
+            }
         }
         else if(gui_mode == "off"){continue;}
 
