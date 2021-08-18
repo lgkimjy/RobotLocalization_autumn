@@ -32,6 +32,8 @@ using namespace cv;
 void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr& msg);
 void bodydeltaCallback(const geometry_msgs::Twist::ConstPtr& msg);
 void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg);
+sensor_msgs::Image image2message(Mat image);
+
 
 struct LandmarkObs {
 	

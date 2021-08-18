@@ -39,6 +39,7 @@ int main(int argc, char **argv)
     ros::Subscriber sub_landmark = nh.subscribe("/alice/vision/detected_objects", 10, landmarkCallback);
 
     ros::Publisher robotpos_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos", 10);
+    ros::Publisher localization_image_pub = nh.advertise<sensor_msgs::Image>("/robot_localization/localization_image", 10);
 
     namedWindow("localization image", CV_WINDOW_NORMAL);
     if(gui_mode == "on_alice"){cvSetWindowProperty("localization image", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);}
@@ -189,6 +190,10 @@ int main(int argc, char **argv)
 
             observations.clear();
 
+            /* publish fully drawn images to web socket */
+            sensor_msgs::Image ros_localization_img = image2message(localization_img);
+            localization_image_pub.publish(ros_localization_img);
+
             imshow("localization image", localization_img);
             waitKey(1);
         }
@@ -242,4 +247,15 @@ void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr &msg)
     //     cout << a.x << ", " << a.y << "    ";
     // }
     // cout << endl;
+}
+
+sensor_msgs::Image image2message(Mat image)
+{   
+    //insert images to ros message
+    cv_bridge::CvImage cv_image;
+    cv_image.image = image;
+    cv_image.encoding = "bgr8";
+    sensor_msgs::Image ros_image;
+    cv_image.toImageMsg(ros_image);
+    return ros_image;
 }

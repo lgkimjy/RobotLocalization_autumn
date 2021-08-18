@@ -18,5 +18,6 @@
     
     <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks" output="screen"/>
 
+    <node name="mjpeg_server" pkg="mjpeg_server" type="mjpeg_server"/> 
 
 </launch>
