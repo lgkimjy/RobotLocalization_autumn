@@ -15,8 +15,8 @@
     <param name="mode" value="$(arg mode)" />
     <param name="gui_mode" value="$(arg gui_mode)" />
     
-    <!-- <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks" output="screen"/> -->
-    <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks"/>
+    <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks" output="screen"/>
+    <!-- <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks"/> -->
 
     <!-- Web Streaming -->
     <node name="mjpeg_server" pkg="mjpeg_server" type="mjpeg_server"/> 

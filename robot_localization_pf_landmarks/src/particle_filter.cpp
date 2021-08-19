@@ -78,7 +78,7 @@ void ParticleFilter::initCircle(double x, double y, double theta, double std[])
         p.x += N_x_init(gen);
         p.y += N_y_init(gen);
         // p.theta += N_theta_init(gen);
-        p.theta += getRandom(theta-1, theta+1);
+        p.theta += getRandom(theta-0.8, theta+0.8);
 
         particles.push_back(p);
     }

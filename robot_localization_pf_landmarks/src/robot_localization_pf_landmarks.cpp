@@ -100,8 +100,8 @@ int main(int argc, char **argv)
 
             if(mode == "PF"){
                 
-                /* if keypoints are not detected more than 3, only use kinematics */
-                if(observations.size() <= 3){
+                /* if keypoints are not detected more than 2, only use kinematics */
+                if(observations.size() <= 2){
                     best_particle.x += (cos(best_particle.theta) * delta_x + sin(best_particle.theta) * delta_y);
                     best_particle.y += (sin(best_particle.theta) * delta_x + cos(best_particle.theta) * delta_y);
                     best_particle.theta += delta_w;
@@ -113,6 +113,7 @@ int main(int argc, char **argv)
                     /* observation detected after non-detection situation, it will re-initalize particle filter */
                     if(obs_count > 0){
                         pf.initCircle(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
+                        ROS_INFO("[robot_localization_pf_landmark] Re-initalize particle filter baed on best particle pose");
                         obs_count = 0;
                     }
                     /* particle movement */

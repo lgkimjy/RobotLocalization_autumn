@@ -10,7 +10,7 @@
     <node name="reposition" pkg="robot_localization_setposition" type="robot_localization_setposition.py"/>
 
     <!-- particle filter -->
-    <arg name="mode" default="PF" />
+    <arg name="mode" default="kinematics" />
     <arg name="gui_mode" default="nuc" />
     <param name="mode" value="$(arg mode)" />
     <param name="gui_mode" value="$(arg gui_mode)" />
