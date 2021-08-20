@@ -3,7 +3,6 @@
  *      Author: junyoung kim / lgkimjy
  */
 #include <robot_localization_pf_landmarks/particle_filter.h>
-#include <mutex>
 
 std::mutex m1;
 
@@ -172,7 +171,8 @@ int main(int argc, char **argv)
 
             flag_move = false;
         }
-        /* summation of alice ideal body delta */
+
+
 
         if (mode == "kinematics")
         {
@@ -194,8 +194,12 @@ int main(int argc, char **argv)
             // ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
         }
 
+
+
         /* ROS Msg Publisher */
         robotpos_pub.publish(robot_pos_msg);
+
+
 
         /* visualize */
         if (gui_mode == "on_alice" || gui_mode == "on" || gui_mode == "nuc")

@@ -14,6 +14,7 @@
 #include <numeric>
 #include <random>
 #include <ctime>
+#include <mutex>
 
 #include <ros/ros.h>
 #include <ros/package.h>
