@@ -19,6 +19,7 @@
     <node name="robot_localization_pf_landmarks" pkg="robot_localization_pf_landmarks" type="robot_localization_pf_landmarks"/>
 
     <!-- Web Streaming -->
+    <node name="robot_localization_streaming" pkg="robot_localization_streaming" type="robot_localization_streaming"/>
     <node name="mjpeg_server" pkg="mjpeg_server" type="mjpeg_server"/> 
 
 </launch>
