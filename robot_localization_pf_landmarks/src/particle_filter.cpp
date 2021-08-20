@@ -95,7 +95,7 @@ void ParticleFilter::noisyMove(float move_x, float move_y, float move_w)
         float noise_w = move_w + getRandomGaussian(0.0, move_w * 5.0);
         
         /* w/ movement noise */
-        particles[i].x += cos(particles[i].theta) * noise_x + sin(particles[i].theta) * noise_y;
+        particles[i].x += cos(particles[i].theta) * noise_x - sin(particles[i].theta) * noise_y;
         particles[i].y += sin(particles[i].theta) * noise_x + cos(particles[i].theta) * noise_y;
         particles[i].theta += noise_w;
         particles[i].theta = fmodf(particles[i].theta + M_PI * 2.0, M_PI * 2.0);
@@ -107,7 +107,7 @@ void ParticleFilter::Move(float move_x, float move_y, float move_w)
     for (int i = 0; i < num_particles; i++)
     {
         /* w/o movement noise */
-        particles[i].x += (cos(particles[i].theta) * move_x + sin(particles[i].theta) * move_y);
+        particles[i].x += (cos(particles[i].theta) * move_x - sin(particles[i].theta) * move_y);
         particles[i].y += (sin(particles[i].theta) * move_x + cos(particles[i].theta) * move_y);
         particles[i].theta += move_w;
         particles[i].theta = fmodf(particles[i].theta + M_PI * 2.0, M_PI*2.0);

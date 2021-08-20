@@ -35,7 +35,7 @@ void bodydeltaCallback(const geometry_msgs::Twist::ConstPtr& msg);
 void landmarkCallback(const alice_msgs::FoundObjectArray::ConstPtr& msg);
 sensor_msgs::Image image2message(Mat image);
 void statusCallback(const std_msgs::String::ConstPtr& msg);
-
+void centerfootCallback(const geometry_msgs::Twist::ConstPtr& msg);
 
 struct LandmarkObs {
 	
