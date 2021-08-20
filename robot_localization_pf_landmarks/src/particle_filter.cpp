@@ -35,9 +35,9 @@ void ParticleFilter::initSquare(float x, float y, float theta)
 {
     num_particles = 1000;
 
-    float repos_range_x[2] = {x - 0.5, x + 0.5};
-    float repos_range_y[2] = {y - 0.5, y + 0.5};
-    float repos_range_w[2] = {theta - 3.14 / 2, theta + 3.14 / 2};
+    float repos_range_x[2] = {x - 0.25, x + 0.25};
+    float repos_range_y[2] = {y - 0.25, y + 0.25};
+    float repos_range_w[2] = {theta - 3.14 / 6, theta + 3.14 / 6};
 
     /* init particles */
     for (int i = 0; i < num_particles; i++)
@@ -63,6 +63,7 @@ void ParticleFilter::initCircle(double x, double y, double theta, double std[])
     normal_distribution<double> N_x_init(0, std[0]);
     normal_distribution<double> N_y_init(0, std[1]);
     normal_distribution<double> N_theta_init(0, std[2]);
+    float repos_range_w[2] = {theta - 3.14 / 4, theta + 3.14 / 4};
 
     /* init particles */
     for (int i = 0; i < num_particles; i++)
@@ -71,14 +72,14 @@ void ParticleFilter::initCircle(double x, double y, double theta, double std[])
         p.id = i;
         p.x = x;
         p.y = y;
-        p.theta = theta;
+        p.theta = getRandom(repos_range_w[0], repos_range_w[1]);;
         p.weight = 1.0;
 
         /* add noise */
         p.x += N_x_init(gen);
         p.y += N_y_init(gen);
         // p.theta += N_theta_init(gen);
-        p.theta += getRandom(theta-0.8, theta+0.8);
+        // p.theta += getRandom(theta-0.8, theta+0.8);
 
         particles.push_back(p);
     }

@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 #endif
 
     /* noise generation */
-    double sigma_pos[3] = {0.25, 0.25, 1.57}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
+    double sigma_pos[3] = {0.1, 0.1, 1.57}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
     double sigma_landmark[2] = {0.3, 0.3};    // Landmark measurement uncertainty [x [m], y [m]]
 
     /* Read map data */
@@ -132,8 +132,8 @@ int main(int argc, char **argv)
                     /* observation detected after non-detection situation, it will re-initalize particle filter */
                     if (obs_count > 0)
                     {
-                        // pf.initSquare(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
-                        pf.initSquare(best_particle.x, best_particle.y, best_particle.theta);
+                        pf.initCircle(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
+                        // pf.initSquare(best_particle.x, best_particle.y, best_particle.theta);
                         ROS_INFO("[robot_localization_pf_landmark] Re-initalize particle filter baed on best particle pose");
                         obs_count = 0;
                     }
@@ -293,7 +293,6 @@ void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr &msg)
     repos_x = (msg->x);
     repos_y = (msg->y);
     repos_w = (msg->theta);
-    ROS_INFO("18");
     pf.is_initialized = false;
 }
 
