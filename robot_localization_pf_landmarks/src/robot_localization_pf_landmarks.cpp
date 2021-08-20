@@ -3,7 +3,7 @@
  *      Author: junyoung kim / lgkimjy
  */
 #include <robot_localization_pf_landmarks/particle_filter.h>
-#include <mutex> 
+#include <mutex>
 
 std::mutex m1;
 
@@ -19,6 +19,7 @@ Mat log_image = color_map_image.clone();
 
 ParticleFilter pf;
 Particle best_particle;
+Particle best_particle_prev;
 vector<LandmarkObs> observations;
 LandmarkObs ball;
 bool flag_move;
@@ -42,7 +43,7 @@ int main(int argc, char **argv)
     nh.getParam("/gui_mode", gui_mode);
 
     ros::Subscriber sub_status = nh.subscribe("/alice/moving_status", 10, statusCallback);
-    ros::Subscriber reposition_sub = nh.subscribe("/alice/reposition", 10, RePositionCallback);
+    ros::Subscriber reposition_sub = nh.subscribe("/alice/reposition", 1000, RePositionCallback);
     ros::Subscriber sub_referencbody = nh.subscribe("/alice/ideal_body_delta", 10, bodydeltaCallback);
     ros::Subscriber sub_landmark = nh.subscribe("/alice/vision/detected_objects", 10, landmarkCallback);
     ros::Subscriber sub_foot_center = nh.subscribe("/heroehs/alice_center_foot_pose", 1000, centerfootCallback);
@@ -95,6 +96,7 @@ int main(int argc, char **argv)
                 // pf.initCircle(repos_x, repos_y, repos_w, sigma_pos);
                 pf.initSquare(repos_x, repos_y, repos_w);
                 best_particle = Particle{0, repos_x, repos_y, repos_w, 1.0};
+                best_particle_prev = Particle{0, repos_x, repos_y, repos_w, 1.0};
             }
             /* reposition for kinematics only movement */
             sum_x = repos_x;
@@ -116,9 +118,13 @@ int main(int argc, char **argv)
                 /* if keypoints are not detected more than 2, only use kinematics */
                 if (observations.size() <= 2)
                 {
-                    best_particle.x += (cos(best_particle.theta) * delta_x - sin(best_particle.theta) * delta_y);
-                    best_particle.y += (sin(best_particle.theta) * delta_x + cos(best_particle.theta) * delta_y);
-                    best_particle.theta += delta_w;
+                    // best_particle.x += (cos(best_particle.theta) * delta_x - sin(best_particle.theta) * delta_y);
+                    // best_particle.y += (sin(best_particle.theta) * delta_x + cos(best_particle.theta) * delta_y);
+                    // best_particle.theta += delta_w;
+
+                    best_particle.x = best_particle_prev.x + (cos(best_particle_prev.theta) * x_local - sin(best_particle_prev.theta) * y_local);
+                    best_particle.y = best_particle_prev.y + (sin(best_particle_prev.theta) * x_local + cos(best_particle_prev.theta) * y_local);
+                    best_particle.theta = best_particle_prev.theta + theta_local;
                     pf.particles.clear();
                     obs_count++;
                 }
@@ -127,12 +133,13 @@ int main(int argc, char **argv)
                     /* observation detected after non-detection situation, it will re-initalize particle filter */
                     if (obs_count > 0)
                     {
-                        pf.initCircle(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
+                        // pf.initSquare(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
+                        pf.initSquare(best_particle.x, best_particle.y, best_particle.theta);
                         ROS_INFO("[robot_localization_pf_landmark] Re-initalize particle filter baed on best particle pose");
                         obs_count = 0;
                     }
                     /* particle movement */
-                    pf.noisyMove(delta_x, delta_y, delta_w);
+                    pf.noisyMove(delta_x, delta_y, delta_w); // ideal_body_delta
 
                     /* Update the weights and resample */
                     pf.updateWeights(sigma_landmark, observations, map);
@@ -158,6 +165,7 @@ int main(int argc, char **argv)
             // sum_y += (sin(sum_theta) * delta_x + cos(sum_theta) * delta_y);
             // sum_theta += delta_w;
 
+            /* summation of alice center foot */
             sum_x = sum_x_prev + (cos(sum_theta_prev) * x_local - sin(sum_theta_prev) * y_local);
             sum_y = sum_y_prev + (sin(sum_theta_prev) * x_local + cos(sum_theta_prev) * y_local);
             sum_theta = sum_theta_prev + theta_local;
@@ -172,9 +180,9 @@ int main(int argc, char **argv)
             robot_pos_msg.x = sum_x - 5.2;
             robot_pos_msg.y = sum_y - 3.7;
             robot_pos_msg.theta = fmodf(sum_theta + M_PI * 2.0, M_PI * 2.0);
-            
-            ROS_INFO("[robot_localization_pf_landmark] Robot Kinematics : %3.2f, %3.2f, %2.3f", sum_x, sum_y, robot_pos_msg.theta);                     // real world
-            ROS_INFO("[robot_localization_pf_landmark] Robot Kinematics : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
+
+            // ROS_INFO("[robot_localization_pf_landmark] Robot Kinematics : %3.2f, %3.2f, %2.3f", sum_x, sum_y, robot_pos_msg.theta);                     // real world
+            // ROS_INFO("[robot_localization_pf_landmark] Robot Kinematics : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
         }
         else if (mode == "PF")
         {
@@ -182,8 +190,8 @@ int main(int argc, char **argv)
             robot_pos_msg.x = best_particle.x - 5.2;
             robot_pos_msg.y = best_particle.y - 3.7;
             robot_pos_msg.theta = fmodf(best_particle.theta + M_PI * 2.0, M_PI * 2.0);
-            ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", best_particle.x, best_particle.y, robot_pos_msg.theta); // real world
-            ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
+            // ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", best_particle.x, best_particle.y, robot_pos_msg.theta); // real world
+            // ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
         }
 
         /* ROS Msg Publisher */
@@ -281,7 +289,7 @@ void RePositionCallback(const geometry_msgs::Pose2D::ConstPtr &msg)
     repos_x = (msg->x);
     repos_y = (msg->y);
     repos_w = (msg->theta);
-
+    ROS_INFO("18");
     pf.is_initialized = false;
 }
 
@@ -346,9 +354,14 @@ void centerfootCallback(const geometry_msgs::Twist::ConstPtr &msg)
         sum_x_prev = sum_x;
         sum_y_prev = sum_y;
         sum_theta_prev = sum_theta;
-        x_local= 0;
-        y_local= 0;
-        theta_local= 0;
+
+        best_particle_prev.x = best_particle.x;
+        best_particle_prev.y = best_particle.y;
+        best_particle_prev.theta = best_particle.theta;
+
+        x_local = 0;
+        y_local = 0;
+        theta_local = 0;
     }
 
     else
@@ -362,11 +375,14 @@ void centerfootCallback(const geometry_msgs::Twist::ConstPtr &msg)
     // sum_y = sum_y_prev + (sin(sum_theta_prev) * x_local + cos(sum_theta_prev) * y_local);
     // sum_theta = sum_theta_prev + theta_local;
 
+    // best_particle.x = best_particle_prev.x + (cos(best_particle_prev.theta) * x_local - sin(best_particle_prev.theta) * y_local);
+    // best_particle.y = best_particle_prev.y + (cos(best_particle_prev.theta) * x_local + sin(best_particle_prev.theta) * y_local);
+    // best_particle.theta = best_particle_prev.theta + theta_local;
+
     // ROS_INFO("----------------------%f-------------------------",msg->linear.z);
     // ROS_INFO("local : %.5f | %.5f | %.5f",x_local,y_local,theta_local);
     // ROS_INFO("sum_p : %.5f | %.5f | %.5f",sum_x_prev,sum_y_prev,sum_theta_prev);
     // ROS_INFO("sum_t : %.5f | %.5f | %.5f",sum_x,sum_y,sum_theta);
     // ROS_INFO("------------------------------------------------");
     m1.unlock();
-
 }
