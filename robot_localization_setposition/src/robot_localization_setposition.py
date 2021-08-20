@@ -89,8 +89,8 @@ if __name__ == "__main__":
             print("ft_seneor : ",left_foot_torque, right_foot_torque)
             # if left_foot_torque >= -20 and right_foot_torque >= -20:
             # state_set_flag = True
-            if kickoffteam == 1:
-                state_set_flag = 1
+            # if kickoffteam == 1:
+            #     state_set_flag = 1
             if state_set_flag:    # which mean people will replace robots postion by manually to the field cetenr
                 state_determine_msg.x = ready_destination[0]
                 state_determine_msg.y = ready_destination[1]
