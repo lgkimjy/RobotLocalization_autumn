@@ -19,9 +19,9 @@ rosrun robot_localization_pf_landmarks robot_localization_pf_landmarks
 
 ## Initialize start/restart postion
 rostopic pub /alice/reposition geometry_msgs/Pose2D \
-"x: 5.2 / 2.8 / 5.8
-y: 3.7 / 0.7
-theta: 0.0 / 1.57" 
+"x: 5.2
+y: 3.7
+theta: 0.0" 
 
 ## Web streaming
 rosrun mjpeg_server mjpeg_server _port:=8080
@@ -33,5 +33,6 @@ roslaunch robot_localization_pf_landmarks robot_localization.launch mode:=kinema
 
 ### Data Record
 ```
-rosbag record -o filename.bag /alice/ideal_body_delta /alice/vision/detected_objects /alice/moving_status /robotis/present_joint_states /rosout /rosout_agg
+rosbag record -o filename.bag /alice/ideal_body_delta /alice/vision/detected_objects /heroehs/alice_center_foot_pose /robotis/present_joint_states
+rosbag record -o result.bag /alice/robot_pos
 ```
