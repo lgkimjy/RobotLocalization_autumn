@@ -19,10 +19,16 @@ string color_image_map_path = ros::package::getPath("robot_localization_data") +
 string white_image_map_path = ros::package::getPath("robot_localization_data") + "/map/white.jpg";
 Mat color_map_image = imread(color_image_map_path.c_str());
 Mat white_map_image = imread(white_image_map_path.c_str());
-Mat log_image = color_map_image.clone();
-Mat blank_pf_img = white_map_image.clone();
-Mat blank_center_img = white_map_image.clone();
-Mat blank_ideal_img = white_map_image.clone();
+
+Mat log_image(740, 1070, color_map_image.type(), cv::Scalar(0,0,0,0));
+Mat blank_pf_img(740, 1070, CV_8UC4, cv::Scalar(0,0,0,0));
+Mat blank_center_img(740, 1070, CV_8UC4, cv::Scalar(0,0,0,0));
+Mat blank_ideal_img(740, 1070, CV_8UC4, cv::Scalar(0,0,0,0));
+
+// Mat log_image = color_map_image.clone();
+// Mat blank_pf_img = white_map_image.clone();
+// Mat blank_center_img = white_map_image.clone();
+// Mat blank_ideal_img = white_map_image.clone();
 
 /* particle and landmark vectors */
 ParticleFilter pf;
@@ -297,12 +303,12 @@ int main(int argc, char **argv)
     /* Logging the final pose data */
     path = ros::package::getPath("robot_localization_data") + "/logs/results-" + to_string(pLocal->tm_mday) + "-" + to_string(pLocal->tm_hour) + "-" + to_string(pLocal->tm_min);
     boost::filesystem::create_directories(path);
-    imwrite(path + "/result.JPG", log_image);
+    imwrite(path + "/result.png", log_image);
     // imwrite(path + "/ideal_body_delta.JPG", log_image);
     // imwrite(path + "/center_foot.JPG", log_image);
-    imwrite(path + "/tranparent_PF.JPG", blank_pf_img);
-    imwrite(path + "/tranparent_ideal_body_delta.JPG", blank_ideal_img);
-    imwrite(path + "/tranparent_center_foot.JPG", blank_center_img);
+    imwrite(path + "/tranparent_PF.png", blank_pf_img);
+    imwrite(path + "/tranparent_ideal_body_delta.png", blank_ideal_img);
+    imwrite(path + "/tranparent_center_foot.png", blank_center_img);
     ROS_INFO("[robot_localization_pf_landmark] Success save log data");
 
     return 0;
