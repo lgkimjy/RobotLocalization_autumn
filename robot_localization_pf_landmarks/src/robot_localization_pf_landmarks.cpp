@@ -16,8 +16,13 @@ float sum_theta_ideal = 0, sum_x_ideal = 0, sum_y_ideal = 0;
 
 /* map data */ 
 string color_image_map_path = ros::package::getPath("robot_localization_data") + "/map/soccer_field.jpg";
+string white_image_map_path = ros::package::getPath("robot_localization_data") + "/map/white.jpg";
 Mat color_map_image = imread(color_image_map_path.c_str());
+Mat white_map_image = imread(white_image_map_path.c_str());
 Mat log_image = color_map_image.clone();
+Mat blank_pf_img = white_map_image.clone();
+Mat blank_center_img = white_map_image.clone();
+Mat blank_ideal_img = white_map_image.clone();
 
 /* particle and landmark vectors */
 ParticleFilter pf;
@@ -56,7 +61,10 @@ int main(int argc, char **argv)
     ros::Subscriber sub_foot_center = nh.subscribe("/heroehs/alice_center_foot_pose", 1000, centerfootCallback);
     ros::Subscriber joint_sub = nh.subscribe("/robotis/present_joint_states",10,jointCallback);
 
-    ros::Publisher robotpos_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos", 10);
+    ros::Publisher robotpos_pf_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos_PF", 10);
+    ros::Publisher robotpos_center_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos_Center", 10);
+    ros::Publisher robotpos_ideal_pub = nh.advertise<geometry_msgs::Pose2D>("/alice/robot_pos_Ideal", 10);
+
     ros::Publisher localization_image_pub = nh.advertise<sensor_msgs::Image>("/robot_localization/localization_image", 10);
 
     #if (CV_MAJOR_VERSION <= 3) 
@@ -92,10 +100,13 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
-        geometry_msgs::Pose2D robot_pos_msg;
+        geometry_msgs::Pose2D robot_pos_pf_msg;
+        geometry_msgs::Pose2D robot_pos_center_msg;
+        geometry_msgs::Pose2D robot_pos_ideal_msg;
 
         if (!pf.initialized())
         {
+            log_image = color_map_image.clone();
             if (mode == "PF")
             {
                 pf.particles.clear();
@@ -127,12 +138,7 @@ int main(int argc, char **argv)
             {
                 /* if keypoints are not detected more than 2, only use kinematics */
                 if (observations.size() <= 2)
-                {
-                    /* ideal body delta */
-                    // best_particle.x += (cos(best_particle.theta) * delta_x - sin(best_particle.theta) * delta_y);
-                    // best_particle.y += (sin(best_particle.theta) * delta_x + cos(best_particle.theta) * delta_y);
-                    // best_particle.theta += delta_w;
-                    
+                {                    
                     /* foot center pose */
                     best_particle.x = best_particle_prev.x + (cos(best_particle_prev.theta) * x_local - sin(best_particle_prev.theta) * y_local);
                     best_particle.y = best_particle_prev.y + (sin(best_particle_prev.theta) * x_local + cos(best_particle_prev.theta) * y_local);
@@ -190,102 +196,99 @@ int main(int argc, char **argv)
             flag_move = false;
         }
 
-        if (mode == "kinematics")
-        {
-            /* Kinematics position */
-            robot_pos_msg.x = sum_x - 5.2;
-            robot_pos_msg.y = sum_y - 3.7;
-            robot_pos_msg.theta = fmodf(sum_theta + M_PI * 2.0, M_PI * 2.0);
-            // ROS_INFO("[robot_localization_pf_landmark] Robot Kinematics : %3.2f, %3.2f, %2.3f", sum_x, sum_y, robot_pos_msg.theta);                     // real world
-            // ROS_INFO("[robot_localization_pf_landmark] Robot Kinematics : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
-        }
-        else if (mode == "PF")
-        {
-            /* PF predicted position */
-            robot_pos_msg.x = best_particle.x - 5.2;
-            robot_pos_msg.y = best_particle.y - 3.7;
-            robot_pos_msg.theta = fmodf(best_particle.theta + M_PI * 2.0, M_PI * 2.0);
-            // ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", best_particle.x, best_particle.y, robot_pos_msg.theta); // real world
-            // ROS_INFO("[robot_localization_pf_landmark] Best Particle : %3.2f, %3.2f, %2.3f", robot_pos_msg.x, robot_pos_msg.y, robot_pos_msg.theta); // global world
-        }
+        /* Kinematics position */
+        robot_pos_center_msg.x = sum_x - 5.2;
+        robot_pos_center_msg.y = sum_y - 3.7;
+        robot_pos_center_msg.theta = fmodf(sum_theta + M_PI * 2.0, M_PI * 2.0);
+
+        /* Kinematics position */
+        robot_pos_ideal_msg.x = sum_x_ideal - 5.2;
+        robot_pos_ideal_msg.y = sum_y_ideal - 3.7;
+        robot_pos_ideal_msg.theta = fmodf(sum_theta_ideal + M_PI * 2.0, M_PI * 2.0);
+        
+        /* PF predicted position */
+        robot_pos_pf_msg.x = best_particle.x - 5.2;
+        robot_pos_pf_msg.y = best_particle.y - 3.7;
+        robot_pos_pf_msg.theta = fmodf(best_particle.theta + M_PI * 2.0, M_PI * 2.0);
+
 
         /* ROS Msg Publisher */
-        robotpos_pub.publish(robot_pos_msg);
+        robotpos_center_pub.publish(robot_pos_center_msg);
+        robotpos_ideal_pub.publish(robot_pos_ideal_msg);
+        robotpos_pf_pub.publish(robot_pos_pf_msg);
+
 
         /* visualize */
-        if (gui_mode == "on_alice" || gui_mode == "on" || gui_mode == "nuc")
+        Mat localization_img = color_map_image.clone();
+
+        if (mode == "PF")
         {
-            Mat localization_img = color_map_image.clone();
-
-            if (mode == "PF")
+            /* visualize landmark based on kinematic calculated pos, kinematics_odom */
+            for (int i = 0; i < pf.particles.size(); i++)
             {
-                /* visualize landmark based on kinematic calculated pos, kinematics_odom */
-                for (int i = 0; i < pf.particles.size(); i++)
+                for (int j = 0; j < observations.size(); j++)
                 {
-                    for (int j = 0; j < observations.size(); j++)
-                    {
-                        double t_x = cos(pf.particles[i].theta) * observations[j].x - sin(pf.particles[i].theta) * observations[j].y + pf.particles[i].x;
-                        double t_y = sin(pf.particles[i].theta) * observations[j].x + cos(pf.particles[i].theta) * observations[j].y + pf.particles[i].y;
-                        Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                        circle(localization_img, ld_point, 7, Scalar(0, 255, 255), -1);
-                        putText(localization_img, to_string(observations[j].id), (ld_point), 1, 1.2, (255, 0, 0), 2, true);
-                    }
-                }
-                double t_x = cos(best_particle.theta) * ball.x - sin(best_particle.theta) * ball.y + best_particle.x;
-                double t_y = sin(best_particle.theta) * ball.x + cos(best_particle.theta) * ball.y + best_particle.y;
-                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                circle(localization_img, ld_point, 10, Scalar(100, 100, 255), -1);
-            }
-            else if (mode == "kinematics")
-            {
-                /* visualize landmark based on kinematic calculated pos, kinematics_odom */
-                for (int i = 0; i < observations.size(); i++)
-                {
-                    double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
-                    double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
+                    double t_x = cos(pf.particles[i].theta) * observations[j].x - sin(pf.particles[i].theta) * observations[j].y + pf.particles[i].x;
+                    double t_y = sin(pf.particles[i].theta) * observations[j].x + cos(pf.particles[i].theta) * observations[j].y + pf.particles[i].y;
                     Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                    circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
+                    circle(localization_img, ld_point, 7, Scalar(0, 255, 255), -1);
+                    putText(localization_img, to_string(observations[j].id), (ld_point), 1, 1.2, (255, 0, 0), 2, true);
                 }
-                double t_x = cos(sum_theta) * ball.x - sin(sum_theta) * ball.y + sum_x;
-                double t_y = sin(sum_theta) * ball.x + cos(sum_theta) * ball.y + sum_y;
-                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
-                circle(localization_img, ld_point, 10, Scalar(100, 100, 255), -1);
-            }
-
-            if (mode == "PF")
-            {
-                /* visualize particle pos */
-                for (int i = 0; i < pf.particles.size(); i++)
-                {
-                    Point2f point = Point2f(pf.particles[i].x * 100, localization_img.size().height - pf.particles[i].y * 100);
-                    circle(localization_img, point, 10, Scalar(0, 255, 255), -1);
-                    arrowedLine(localization_img, point, Point2f(point.x + 10 * cos(pf.particles[i].theta), point.y + 10 * -sin(pf.particles[i].theta)), Scalar(0, 0, 255), 3);
-                }
-            }
-            /* visualize robot pos */
-            Point2f robot_point = Point2f(robot_pos_msg.x * 100 + localization_img.size().width / 2, localization_img.size().height - robot_pos_msg.y * 100 - localization_img.size().height / 2);
-            circle(localization_img, robot_point, 12, Scalar(255, 0, 0), -1);
-            arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_msg.theta), robot_point.y + 12 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
-
-            /* log images */
-            circle(log_image, robot_point, 6, Scalar(255, 0, 0), -1);
-            arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_msg.theta), robot_point.y + 6 * -sin(robot_pos_msg.theta)), Scalar(255, 255, 0), 3);
-
-            /* clear and re-initialize */
-            observations.clear();
-            ball = LandmarkObs{};
-
-            /* publish fully drawn images to web socket */
-            sensor_msgs::Image ros_localization_img = image2message(localization_img);
-            localization_image_pub.publish(ros_localization_img);
-
-            if (gui_mode != "nuc")
-            {
-                imshow("localization image", localization_img);
-                waitKey(1);
             }
         }
-        else if (gui_mode == "off"){continue;}
+        else if (mode == "kinematics")
+        {
+            /* visualize landmark based on kinematic calculated pos, kinematics_odom */
+            for (int i = 0; i < observations.size(); i++)
+            {
+                double t_x = cos(sum_theta) * observations[i].x - sin(sum_theta) * observations[i].y + sum_x;
+                double t_y = sin(sum_theta) * observations[i].x + cos(sum_theta) * observations[i].y + sum_y;
+                Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
+                circle(localization_img, ld_point, 7, Scalar(0, 0, 255), -1);
+            }
+        }
+
+        if (mode == "PF")
+        {
+            /* visualize particle pos */
+            for (int i = 0; i < pf.particles.size(); i++)
+            {
+                Point2f point = Point2f(pf.particles[i].x * 100, localization_img.size().height - pf.particles[i].y * 100);
+                circle(localization_img, point, 10, Scalar(0, 255, 255), -1);
+                arrowedLine(localization_img, point, Point2f(point.x + 10 * cos(pf.particles[i].theta), point.y + 10 * -sin(pf.particles[i].theta)), Scalar(0, 0, 255), 3);
+            }
+        }
+        /* visualize robot pos */
+        Point2f robot_point; 
+        robot_point = Point2f(robot_pos_pf_msg.x * 100 + localization_img.size().width / 2, localization_img.size().height - robot_pos_pf_msg.y * 100 - localization_img.size().height / 2);
+        circle(localization_img, robot_point, 12, Scalar(255, 0, 0), -1);
+        arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_pf_msg.theta), robot_point.y + 12 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0), 3);
+        circle(blank_pf_img, robot_point, 12, Scalar(255, 0, 0), -1);
+        arrowedLine(blank_pf_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_pf_msg.theta), robot_point.y + 12 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0), 3);
+        
+        robot_point = Point2f(robot_pos_center_msg.x * 100 + blank_center_img.size().width / 2, blank_center_img.size().height - robot_pos_center_msg.y * 100 - blank_center_img.size().height / 2);
+        circle(localization_img, robot_point, 12, Scalar(0, 0, 255), -1);
+        arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_center_msg.theta), robot_point.y + 12 * -sin(robot_pos_center_msg.theta)), Scalar(255, 255, 0), 3);
+        circle(blank_center_img, robot_point, 12, Scalar(255, 0, 0), -1);
+        arrowedLine(blank_center_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_center_msg.theta), robot_point.y + 12 * -sin(robot_pos_center_msg.theta)), Scalar(255, 255, 0), 3);
+        
+        robot_point = Point2f(robot_pos_ideal_msg.x * 100 + blank_ideal_img.size().width / 2, blank_ideal_img.size().height - robot_pos_ideal_msg.y * 100 - blank_ideal_img.size().height / 2);
+        circle(localization_img, robot_point, 12, Scalar(255, 0, 0), -1);
+        arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_ideal_msg.theta), robot_point.y + 12 * -sin(robot_pos_ideal_msg.theta)), Scalar(255, 255, 0), 3);
+        circle(blank_ideal_img, robot_point, 12, Scalar(255, 0, 0), -1);
+        arrowedLine(blank_ideal_img, robot_point, Point2f(robot_point.x + 12 * cos(robot_pos_ideal_msg.theta), robot_point.y + 12 * -sin(robot_pos_ideal_msg.theta)), Scalar(255, 255, 0), 3);
+
+        /* log images */
+        circle(log_image, robot_point, 6, Scalar(255, 0, 0), -1);
+        arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_pf_msg.theta), robot_point.y + 6 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0), 3);
+
+        /* clear and re-initialize */
+        // observations.clear();
+        // ball = LandmarkObs{};
+
+        /* publish fully drawn images to web socket */
+        sensor_msgs::Image ros_localization_img = image2message(localization_img);
+        localization_image_pub.publish(ros_localization_img);
 
         ros::spinOnce();
         loop_rate.sleep();
@@ -294,13 +297,17 @@ int main(int argc, char **argv)
     /* Logging the final pose data */
     path = ros::package::getPath("robot_localization_data") + "/logs/results-" + to_string(pLocal->tm_mday) + "-" + to_string(pLocal->tm_hour) + "-" + to_string(pLocal->tm_min);
     boost::filesystem::create_directories(path);
-    imwrite(path + "/PF.JPG", log_image);
+    imwrite(path + "/result.JPG", log_image);
     // imwrite(path + "/ideal_body_delta.JPG", log_image);
     // imwrite(path + "/center_foot.JPG", log_image);
+    imwrite(path + "/tranparent_PF.JPG", blank_pf_img);
+    imwrite(path + "/tranparent_ideal_body_delta.JPG", blank_ideal_img);
+    imwrite(path + "/tranparent_center_foot.JPG", blank_center_img);
     ROS_INFO("[robot_localization_pf_landmark] Success save log data");
 
     return 0;
 }
+
 
 
 /* ----------------------- ROS CALLBACK FUNC ----------------------- */
