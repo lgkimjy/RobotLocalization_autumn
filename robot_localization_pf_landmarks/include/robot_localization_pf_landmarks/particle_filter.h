@@ -9,6 +9,7 @@
 #include "helper_functions.h"
 
 #include <iostream>
+#include <boost/filesystem.hpp>
 #include <random>
 #include <algorithm>
 #include <numeric>
