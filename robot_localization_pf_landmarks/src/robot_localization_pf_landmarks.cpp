@@ -12,6 +12,7 @@ float repos_x = 0, repos_y = 0, repos_w = 0;
 float sum_x_prev = 0, sum_y_prev = 0, sum_theta_prev = 0;
 float x_local = 0, y_local = 0, theta_local = 0;
 float sum_theta = 0, sum_x = 0, sum_y = 0;
+float sum_theta_ideal = 0, sum_x_ideal = 0, sum_y_ideal = 0;
 
 /* map data */ 
 string color_image_map_path = ros::package::getPath("robot_localization_data") + "/map/soccer_field.jpg";
@@ -38,6 +39,7 @@ string gui_mode;
 /* time data for logging localize result */
 time_t curTime = time(NULL);
 struct tm *pLocal = localtime(&curTime);
+string path;
 
 int main(int argc, char **argv)
 {
@@ -104,6 +106,10 @@ int main(int argc, char **argv)
                 best_particle_prev = Particle{0, repos_x, repos_y, repos_w, 1.0};
             }
             /* reposition for kinematics only movement */
+            sum_x_ideal = repos_x;
+            sum_y_ideal = repos_y;
+            sum_theta_ideal = repos_w;
+
             sum_x = repos_x;
             sum_y = repos_y;
             sum_theta = repos_w;
@@ -156,7 +162,6 @@ int main(int argc, char **argv)
                     vector<Particle> particles = pf.particles;
                     int num_particles = particles.size();
                     double highest_weight = 0.0;
-                    // Particle best_particle;
                     for (int i = 0; i < num_particles; ++i){
                         if (particles[i].weight > highest_weight){
                             highest_weight = particles[i].weight;
@@ -173,9 +178,9 @@ int main(int argc, char **argv)
             }
 
             /* summation of alice ideal body delta */
-            // sum_x += (cos(sum_theta) * delta_x + sin(sum_theta) * delta_y);
-            // sum_y += (sin(sum_theta) * delta_x + cos(sum_theta) * delta_y);
-            // sum_theta += delta_w;
+            sum_x_ideal += (cos(sum_theta_ideal) * delta_x + sin(sum_theta_ideal) * delta_y);
+            sum_y_ideal += (sin(sum_theta_ideal) * delta_x + cos(sum_theta_ideal) * delta_y);
+            sum_theta_ideal += delta_w;
 
             /* summation of alice center foot */
             sum_x = sum_x_prev + (cos(sum_theta_prev) * x_local - sin(sum_theta_prev) * y_local);
@@ -285,7 +290,13 @@ int main(int argc, char **argv)
         ros::spinOnce();
         loop_rate.sleep();
     }
-    imwrite(ros::package::getPath("robot_localization_data") + "/logs/odom-" + to_string(pLocal->tm_mday) + "-" + to_string(pLocal->tm_hour) + "-" + to_string(pLocal->tm_min) + ".JPG", log_image);
+
+    /* Logging the final pose data */
+    path = ros::package::getPath("robot_localization_data") + "/logs/results-" + to_string(pLocal->tm_mday) + "-" + to_string(pLocal->tm_hour) + "-" + to_string(pLocal->tm_min);
+    boost::filesystem::create_directories(path);
+    imwrite(path + "/PF.JPG", log_image);
+    // imwrite(path + "/ideal_body_delta.JPG", log_image);
+    // imwrite(path + "/center_foot.JPG", log_image);
     ROS_INFO("[robot_localization_pf_landmark] Success save log data");
 
     return 0;

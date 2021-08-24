@@ -4,7 +4,6 @@ use known keypoints monte carlo localzation algorithm
 ### Requirements
 ```
 git clone https://github.com/RobotWebTools/mjpeg_server
-cm
 ```
 
 ### How to use
@@ -36,3 +35,14 @@ roslaunch robot_localization_pf_landmarks robot_localization.launch mode:=kinema
 rosbag record -o filename.bag /alice/ideal_body_delta /alice/vision/detected_objects /heroehs/alice_center_foot_pose /robotis/present_joint_states
 rosbag record -o result.bag /alice/robot_pos
 ```
+
+### DATA to record
+1. images to save
+* foot_center_pose
+* ideal_body_delta
+* PF_robot_pos
+* every poses in single image
+2. positions to save -> rosbag (global position)
+* foot_center_pose
+* ideal_body_delta
+* PF_robot_pos
