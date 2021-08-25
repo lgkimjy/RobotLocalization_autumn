@@ -20,10 +20,10 @@ string white_image_map_path = ros::package::getPath("robot_localization_data") +
 Mat color_map_image = imread(color_image_map_path.c_str());
 Mat white_map_image = imread(white_image_map_path.c_str());
 
-Mat log_image(740, 1070, color_map_image.type(), cv::Scalar(0,0,0,0));
-Mat blank_pf_img(740, 1070, CV_8UC4, cv::Scalar(0,0,0,0));
-Mat blank_center_img(740, 1070, CV_8UC4, cv::Scalar(0,0,0,0));
-Mat blank_ideal_img(740, 1070, CV_8UC4, cv::Scalar(0,0,0,0));
+Mat log_image(740, 1040, color_map_image.type(), cv::Scalar(0,0,0,0));
+Mat blank_pf_img(740, 1040, CV_8UC4, cv::Scalar(0,0,0,0));
+Mat blank_center_img(740, 1040, CV_8UC4, cv::Scalar(0,0,0,0));
+Mat blank_ideal_img(740, 1040, CV_8UC4, cv::Scalar(0,0,0,0));
 
 // Mat log_image = color_map_image.clone();
 // Mat blank_pf_img = white_map_image.clone();
@@ -269,20 +269,26 @@ int main(int argc, char **argv)
         robot_point = Point2f(robot_pos_center_msg.x * 100 + blank_center_img.size().width / 2, blank_center_img.size().height - robot_pos_center_msg.y * 100 - blank_center_img.size().height / 2);
         circle(localization_img, robot_point, 6, Scalar(0, 0, 255), -1);
         arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_center_msg.theta), robot_point.y + 6 * -sin(robot_pos_center_msg.theta)), Scalar(153, 153, 255), 3);
-        circle(blank_center_img, robot_point, 6, Scalar(0, 0, 255), -1);
-        arrowedLine(blank_center_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_center_msg.theta), robot_point.y + 6 * -sin(robot_pos_center_msg.theta)), Scalar(153, 153, 255), 3);
+        circle(log_image, robot_point, 6, Scalar(0, 0, 255), -1);
+        arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_center_msg.theta), robot_point.y + 6 * -sin(robot_pos_center_msg.theta)), Scalar(153, 153, 255), 3);
+        circle(blank_center_img, robot_point, 6, Scalar(0, 0, 255, 255), -1);
+        arrowedLine(blank_center_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_center_msg.theta), robot_point.y + 6 * -sin(robot_pos_center_msg.theta)), Scalar(0, 153, 153, 255), 3);
         
         robot_point = Point2f(robot_pos_ideal_msg.x * 100 + blank_ideal_img.size().width / 2, blank_ideal_img.size().height - robot_pos_ideal_msg.y * 100 - blank_ideal_img.size().height / 2);
         circle(localization_img, robot_point, 6, Scalar(0, 128, 255), -1);
         arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_ideal_msg.theta), robot_point.y + 6 * -sin(robot_pos_ideal_msg.theta)), Scalar(153, 204, 255), 3);
-        circle(blank_ideal_img, robot_point, 6, Scalar(0, 128, 255), -1);
-        arrowedLine(blank_ideal_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_ideal_msg.theta), robot_point.y + 6 * -sin(robot_pos_ideal_msg.theta)), Scalar(153, 204, 255), 3);
+        circle(log_image, robot_point, 6, Scalar(0, 128, 255), -1);
+        arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_ideal_msg.theta), robot_point.y + 6 * -sin(robot_pos_ideal_msg.theta)), Scalar(153, 204, 255), 3);
+        circle(blank_ideal_img, robot_point, 6, Scalar(0, 128, 255, 255), -1);
+        arrowedLine(blank_ideal_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_ideal_msg.theta), robot_point.y + 6 * -sin(robot_pos_ideal_msg.theta)), Scalar(0, 153, 204, 255), 3);
 
         robot_point = Point2f(robot_pos_pf_msg.x * 100 + localization_img.size().width / 2, localization_img.size().height - robot_pos_pf_msg.y * 100 - localization_img.size().height / 2);
         circle(localization_img, robot_point, 6, Scalar(255, 0, 0), -1);
         arrowedLine(localization_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_pf_msg.theta), robot_point.y + 6 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0), 3);
-        circle(blank_pf_img, robot_point, 6, Scalar(255, 0, 0), -1);
-        arrowedLine(blank_pf_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_pf_msg.theta), robot_point.y + 6 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0), 3);
+        circle(log_image, robot_point, 6, Scalar(255, 0, 0), -1);
+        arrowedLine(log_image, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_pf_msg.theta), robot_point.y + 6 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0), 3);
+        circle(blank_pf_img, robot_point, 6, Scalar(255, 0, 0, 255), -1);
+        arrowedLine(blank_pf_img, robot_point, Point2f(robot_point.x + 6 * cos(robot_pos_pf_msg.theta), robot_point.y + 6 * -sin(robot_pos_pf_msg.theta)), Scalar(255, 255, 0, 255), 3);
         
         /* log images */
         // circle(log_image, robot_point, 6, Scalar(255, 0, 0), -1);
@@ -306,9 +312,9 @@ int main(int argc, char **argv)
     imwrite(path + "/result.png", log_image);
     // imwrite(path + "/ideal_body_delta.JPG", log_image);
     // imwrite(path + "/center_foot.JPG", log_image);
-    imwrite(path + "/tranparent_PF.png", blank_pf_img);
-    imwrite(path + "/tranparent_ideal_body_delta.png", blank_ideal_img);
-    imwrite(path + "/tranparent_center_foot.png", blank_center_img);
+    imwrite(path + "/result_tranparent_PF.png", blank_pf_img);
+    imwrite(path + "/result_tranparent_ideal_body_delta.png", blank_ideal_img);
+    imwrite(path + "/result_tranparent_center_foot.png", blank_center_img);
     ROS_INFO("[robot_localization_pf_landmark] Success save log data");
 
     return 0;
