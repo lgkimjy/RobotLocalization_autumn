@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 import sys
 
-trajectory_img = cv2.imread("./scenario2/gt.png", -1)
-feild_img = cv2.imread("./scenario2/result.png", -1)
+feild_img = cv2.imread("./results-25-17-47/result.png", -1)
+trajectory_img = cv2.imread("./results-25-17-47/gt.png", -1)
 h, w, depth = trajectory_img.shape
 result = np.zeros((h, w, 3), np.uint8)
 
@@ -19,4 +19,4 @@ for i in range(h):
         result[i, j] = new_color
 
 
-cv2.imwrite('./scenario2/result_with_gt.JPG', result)
+cv2.imwrite('./result_with_gt.JPG', result)
