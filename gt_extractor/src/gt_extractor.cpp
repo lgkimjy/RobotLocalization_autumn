@@ -17,7 +17,7 @@ int main(int argc, char **argv){
     ros::Rate loop_rate(10);
 
 	vector<ground_truth> gt;
-	if (!read_gt_data(ros::package::getPath("robot_localization_data") + "/scenarios/scenario3/gt.txt", gt)) {
+	if (!read_gt_data(ros::package::getPath("robot_localization_data") + "/scenarios/scenario4/gt.txt", gt)) {
 		cout << "Error: Could not open ground truth data file" << endl;
 		return -1;
 	}else{cout << "Success!" << endl;}
@@ -109,7 +109,7 @@ int main(int argc, char **argv){
         loop_rate.sleep();
     }
 
-    imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/gt.png", blank_gt_img);
+    imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario4/gt.png", blank_gt_img);
     // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/pf.png", blank_pf_img);
     // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/ideal.png", blank_ideal_img);
     // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/center.png", blank_center_img);
