@@ -28,17 +28,17 @@ int main(int argc, char **argv){
 	// 	return -1;
 	// }else{cout << "Success!" << endl;}
 
-	// vector<pose> foot_center;
-	// if (!read_pose_data(ros::package::getPath("robot_localization_data") + "/scenarios/scenario1/foot_center.txt", foot_center)) {
-	// 	cout << "Error: Could not open ground truth data file" << endl;
-	// 	return -1;
-	// }else{cout << "Success!" << endl;}
+	vector<pose> foot_center;
+	if (!read_pose_data(ros::package::getPath("robot_localization_data") + "/scenarios/scenario1/foot_center.txt", foot_center)) {
+		cout << "Error: Could not open ground truth data file" << endl;
+		return -1;
+	}else{cout << "Success!" << endl;}
 
-	// vector<pose> pf;
-	// if (!read_pose_data(ros::package::getPath("robot_localization_data") + "/scenarios/scenario1/pf.txt", pf)) {
-	// 	cout << "Error: Could not open ground truth data file" << endl;
-	// 	return -1;
-	// }else{cout << "Success!" << endl;}
+	vector<pose> pf;
+	if (!read_pose_data(ros::package::getPath("robot_localization_data") + "/scenarios/scenario1/pf.txt", pf)) {
+		cout << "Error: Could not open ground truth data file" << endl;
+		return -1;
+	}else{cout << "Success!" << endl;}
 
     while (ros::ok())
     {
@@ -78,42 +78,42 @@ int main(int argc, char **argv){
         //         pre_robot_point = robot_point;
         //     }
         // }
-        // /* center foot */
-        // for(int i=0; i<foot_center.size(); i++){
-        //     if(i==0){
-        //         pre_robot_point = Point2f(foot_center[i].x * 100 + blank_center_img.size().width / 2, blank_center_img.size().height - foot_center[i].y * 100 - blank_center_img.size().height / 2);
-        //         circle(blank_center_img, robot_point, 3, Scalar(0, 0, 255, 255), -1);
-        //     }
-        //     else{
-        //         robot_point = Point2f(foot_center[i].x * 100 + blank_center_img.size().width / 2, blank_center_img.size().height - foot_center[i].y * 100 - blank_center_img.size().height / 2);
-        //         line(blank_center_img, pre_robot_point, robot_point, Scalar(0, 0, 255, 255), 4);
-        //         line(blank_sum, pre_robot_point, robot_point, Scalar(0, 0, 255, 255), 4);
-        //         pre_robot_point = robot_point;
-        //     }
-        // }
-        // /* pf */
-        // for(int i=0; i<pf.size(); i++){
-        //     if(i==0){
-        //         pre_robot_point = Point2f(pf[i].x * 100 + blank_pf_img.size().width / 2, blank_pf_img.size().height - pf[i].y * 100 - blank_pf_img.size().height / 2);
-        //         circle(blank_pf_img, robot_point, 3, Scalar(255, 0, 0, 255), -1);
-        //     }
-        //     else{
-        //         robot_point = Point2f(pf[i].x * 100 + blank_pf_img.size().width / 2, blank_pf_img.size().height - pf[i].y * 100 - blank_pf_img.size().height / 2);
-        //         line(blank_pf_img, pre_robot_point, robot_point, Scalar(255, 0, 0, 255), 4);
-        //         line(blank_sum, pre_robot_point, robot_point, Scalar(255, 0, 0, 255), 4);
-        //         pre_robot_point = robot_point;
-        //     }
-        // }
+        /* center foot */
+        for(int i=0; i<foot_center.size(); i++){
+            if(i==0){
+                pre_robot_point = Point2f(foot_center[i].x * 100 + blank_center_img.size().width / 2, blank_center_img.size().height - foot_center[i].y * 100 - blank_center_img.size().height / 2);
+                circle(blank_center_img, robot_point, 3, Scalar(0, 0, 255, 255), -1);
+            }
+            else{
+                robot_point = Point2f(foot_center[i].x * 100 + blank_center_img.size().width / 2, blank_center_img.size().height - foot_center[i].y * 100 - blank_center_img.size().height / 2);
+                line(blank_center_img, pre_robot_point, robot_point, Scalar(0, 0, 255, 255), 4);
+                line(blank_sum, pre_robot_point, robot_point, Scalar(0, 0, 255, 255), 4);
+                pre_robot_point = robot_point;
+            }
+        }
+        /* pf */
+        for(int i=0; i<pf.size(); i++){
+            if(i==0){
+                pre_robot_point = Point2f(pf[i].x * 100 + blank_pf_img.size().width / 2, blank_pf_img.size().height - pf[i].y * 100 - blank_pf_img.size().height / 2);
+                circle(blank_pf_img, robot_point, 3, Scalar(255, 0, 0, 255), -1);
+            }
+            else{
+                robot_point = Point2f(pf[i].x * 100 + blank_pf_img.size().width / 2, blank_pf_img.size().height - pf[i].y * 100 - blank_pf_img.size().height / 2);
+                line(blank_pf_img, pre_robot_point, robot_point, Scalar(255, 0, 0, 255), 4);
+                line(blank_sum, pre_robot_point, robot_point, Scalar(255, 0, 0, 255), 4);
+                pre_robot_point = robot_point;
+            }
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
     }
 
     imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario4/gt.png", blank_gt_img);
-    // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/pf.png", blank_pf_img);
     // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/ideal.png", blank_ideal_img);
-    // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/center.png", blank_center_img);
-    // imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/sum.png", blank_pf_img);
+    imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/center.png", blank_center_img);
+    imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/pf.png", blank_pf_img);
+    imwrite(ros::package::getPath("robot_localization_data") + "/logs/scenario3/sum.png", blank_sum);
 
     return 0;
 }
