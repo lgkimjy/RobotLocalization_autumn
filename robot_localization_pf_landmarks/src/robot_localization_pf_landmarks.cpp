@@ -241,6 +241,10 @@ int main(int argc, char **argv)
                     putText(localization_img, to_string(observations[j].id), (ld_point), 1, 1.2, (255, 0, 0), 2, true);
                 }
             }
+            double t_x = cos(best_particle.theta) * ball.x - sin(best_particle.theta) * ball.y + best_particle.x;
+            double t_y = sin(best_particle.theta) * ball.x + cos(best_particle.theta) * ball.y + best_particle.y;
+            Point2f ld_point = Point2f(t_x * 100, localization_img.size().height - t_y * 100);
+            circle(localization_img, ld_point, 10, Scalar(100, 100, 255), -1);
         }
         else if (mode == "kinematics")
         {
